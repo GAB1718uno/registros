@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { crearLikes, obtenerLikeIndividual, obtenerLikes } from '../controllers/likes';
+import { crearLikes, obtenerLikeIndividual, obtenerLikes, borrarLikes } from '../controllers/likes';
 
 const router = Router();
 
@@ -14,6 +14,8 @@ router.get('/:id', obtenerSepultura ) //[ validarJwt ],
 router.get('/', obtenerLikes)
 
 router.get('/:fallecidoId', obtenerLikeIndividual)
+
+router.delete('/:fallecidoId', borrarLikes)
 
 router.post('/', crearLikes ) //[ validarJwt ],
 

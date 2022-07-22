@@ -42,3 +42,18 @@ export const obtenerLikes = async (req:Request, res:Response) => {
 res.json(likes)
 
 }
+
+export const borrarLikes = async (req:Request, res:Response) => {
+    const fallecidoId = req.params;
+    const usuarioId = req.body
+    console.log(usuarioId)
+
+    const likes = await Likes.findOne( 
+        {
+            where: {usuarioId : usuarioId},
+        }
+)
+
+await likes?.destroy()
+
+}

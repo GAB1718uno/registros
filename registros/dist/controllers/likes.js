@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.obtenerLikes = exports.obtenerLikeIndividual = exports.crearLikes = void 0;
+exports.borrarLikes = exports.obtenerLikes = exports.obtenerLikeIndividual = exports.crearLikes = void 0;
 const likes_1 = __importDefault(require("../models/likes"));
 const crearLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
@@ -49,4 +49,14 @@ const obtenerLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     res.json(likes);
 });
 exports.obtenerLikes = obtenerLikes;
+const borrarLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const fallecidoId = req.params;
+    const usuarioId = req.body;
+    console.log(usuarioId);
+    const likes = yield likes_1.default.findOne({
+        where: { usuarioId: usuarioId },
+    });
+    yield (likes === null || likes === void 0 ? void 0 : likes.destroy());
+});
+exports.borrarLikes = borrarLikes;
 //# sourceMappingURL=likes.js.map
