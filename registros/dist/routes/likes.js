@@ -12,7 +12,7 @@ router.get('/:id', obtenerSepultura ) //[ validarJwt ],
  */
 router.get('/', likes_1.obtenerLikes);
 router.get('/:fallecidoId', likes_1.obtenerLikeIndividual);
-router.delete('/:fallecidoId', likes_1.borrarLikes);
+router.delete('/:fallecidoId/:usuarioId', likes_1.borrarLikes);
 router.post('/', likes_1.crearLikes); //[ validarJwt ],
 exports.default = router;
 //# sourceMappingURL=likes.js.map

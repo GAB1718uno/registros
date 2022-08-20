@@ -24,7 +24,7 @@ router.put('/:id', [
     validarCampos_1.validarCampos,
     validarEmail_1.validarEmail
 ], usuarios_1.actualizarUsuario);
-router.post('/', [validarJWT_1.validarJwt], usuarios_1.comprobarLogin);
+router.post('/', usuarios_1.comprobarLogin); //[ validarJwt ]
 router.delete('/:id', usuarios_1.deleteUsuario);
 exports.default = router;
 //# sourceMappingURL=usuarios.js.map

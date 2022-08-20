@@ -106,13 +106,23 @@ exports.obtenerUsuarios = obtenerUsuarios;
 const obtenerUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const usuario = yield usuario_1.default.findByPk(id);
-    if (usuario) {
-        res.status(500).json({ ok: true,
-            usuario, });
+    try {
+        if (usuario) {
+            res.json(usuario);
+            /* res.status(200).json({
+                ok:true,
+                usuario
+                }) */
+        }
+        else {
+            res.status(404).json({
+                msg: `No existe un usuario con este ID`
+            });
+        }
     }
-    else {
-        res.status(404).json({
-            msg: `No existe un usuario con este ID`
+    catch (error) {
+        res.status(500).json({
+            msg: `Hable con administrador`
         });
     }
 });

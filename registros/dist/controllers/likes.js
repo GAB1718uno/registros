@@ -16,8 +16,17 @@ exports.borrarLikes = exports.obtenerLikes = exports.obtenerLikeIndividual = exp
 const likes_1 = __importDefault(require("../models/likes"));
 const crearLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
-    const likes = likes_1.default.build(body);
-    yield likes.save();
+    try {
+        const likes = likes_1.default.build(body);
+        yield likes.save();
+        res.json(likes);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: `Hable con el Administrador`
+        });
+    }
 });
 exports.crearLikes = crearLikes;
 const obtenerLikeIndividual = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -50,13 +59,14 @@ const obtenerLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.obtenerLikes = obtenerLikes;
 const borrarLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const fallecidoId = req.params;
-    const usuarioId = req.body;
+    const fallecidoId = req.params.fallecidoId;
+    const usuarioId = req.params.usuarioId;
     console.log(usuarioId);
     const likes = yield likes_1.default.findOne({
-        where: { usuarioId: usuarioId },
+        where: { usuarioId: usuarioId, fallecidoId: fallecidoId },
     });
     yield (likes === null || likes === void 0 ? void 0 : likes.destroy());
+    res.json(likes);
 });
 exports.borrarLikes = borrarLikes;
 //# sourceMappingURL=likes.js.map

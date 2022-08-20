@@ -13,5 +13,6 @@ router.get('/:id', obtenerSepultura ) //[ validarJwt ],
 router.get('/', comentarios_1.obtenerComentarios);
 router.get('/:fallecidoId', comentarios_1.obtenerComentarioIndividual);
 router.post('/', comentarios_1.crearComentarios); //[ validarJwt ],
+router.delete('/:id', comentarios_1.deleteComentario);
 exports.default = router;
 //# sourceMappingURL=comentarios.js.map

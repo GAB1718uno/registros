@@ -102,18 +102,29 @@ export const obtenerUsuario = async (req: Request, res: Response) => {
 
     const usuario = await Usuario.findByPk( id );
 
-    
+     try {
     if(usuario) {
-        res.status(500).json(
-            { ok: true,
-                usuario,}
-            )
+       
+
+            res.json(usuario)
+            /* res.status(200).json({ 
+                ok:true,
+                usuario
+                }) */
+            
+        
         
     } else {
         res.status(404).json({
             msg: `No existe un usuario con este ID`
         })
     }
+} catch (error) {
+        
+            res.status(500).json({
+                msg: `Hable con administrador`
+            })
+        }
 
 }
 

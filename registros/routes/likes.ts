@@ -15,7 +15,7 @@ router.get('/', obtenerLikes)
 
 router.get('/:fallecidoId', obtenerLikeIndividual)
 
-router.delete('/:fallecidoId', borrarLikes)
+router.delete('/:fallecidoId/:usuarioId', borrarLikes)
 
 router.post('/', crearLikes ) //[ validarJwt ],
 

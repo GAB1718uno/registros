@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.obtenerComentarios = exports.obtenerComentarioIndividual = exports.crearComentarios = void 0;
+exports.deleteComentario = exports.obtenerComentarios = exports.obtenerComentarioIndividual = exports.crearComentarios = void 0;
 const comentario_1 = __importDefault(require("../models/comentario"));
 const crearComentarios = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
@@ -25,10 +25,7 @@ const obtenerComentarioIndividual = (req, res) => __awaiter(void 0, void 0, void
     console.log(fallecidoId);
     const comentarios = yield comentario_1.default.findAll({ where: { fallecidoId: fallecidoId } });
     try {
-        if (!fallecidoId) {
-            res.json(comentarios);
-        }
-        return res.json(comentarios);
+        res.json(comentarios);
     }
     catch (error) {
         console.log(error);
@@ -41,12 +38,23 @@ exports.obtenerComentarioIndividual = obtenerComentarioIndividual;
 const obtenerComentarios = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { fallecidoId } = req.body;
     console.log(fallecidoId);
-    const comentarios = yield comentario_1.default.findAll(
-    /* {
-        where: {fallecidoId : fallecidoId},
-    } */
-    );
+    const comentarios = yield comentario_1.default.findAll();
     res.json(comentarios);
 });
 exports.obtenerComentarios = obtenerComentarios;
+const deleteComentario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const comentario = yield comentario_1.default.findByPk(id);
+    try {
+        comentario === null || comentario === void 0 ? void 0 : comentario.destroy();
+        res.json(comentario);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: `Hable con el Administrador`
+        });
+    }
+});
+exports.deleteComentario = deleteComentario;
 //# sourceMappingURL=comentarios.js.map

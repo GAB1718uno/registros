@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import { crearComentarios, obtenerComentarioIndividual, obtenerComentarios } from '../controllers/comentarios';
-import { crearLikes, obtenerLikeIndividual, obtenerLikes } from '../controllers/likes';
+import { crearComentarios, obtenerComentarioIndividual, obtenerComentarios, deleteComentario } from '../controllers/comentarios';
 
 const router = Router();
 
@@ -17,5 +16,7 @@ router.get('/', obtenerComentarios)
 router.get('/:fallecidoId', obtenerComentarioIndividual)
 
 router.post('/', crearComentarios ) //[ validarJwt ],
+
+router.delete('/:id', deleteComentario)
 
 export default router;

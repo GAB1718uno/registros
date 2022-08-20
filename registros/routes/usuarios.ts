@@ -34,7 +34,7 @@ router.put('/:id',
     validarEmail
 ] , actualizarUsuario );
 
-router.post('/', [ validarJwt ], comprobarLogin);
+router.post('/', comprobarLogin); //[ validarJwt ]
 
 router.delete('/:id', deleteUsuario);
 

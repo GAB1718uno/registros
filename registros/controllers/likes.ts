@@ -4,8 +4,20 @@ import Likes from '../models/likes';
 export const crearLikes = async (req:Request, res:Response) => {
     const body = req.body;
 
-    const likes = Likes.build(body);
+    try {
+        const likes = Likes.build(body);
     await likes.save();
+           res.json(likes) 
+    
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            msg: `Hable con el Administrador`
+        })
+         }
+
+
+   
 }
 
 export const obtenerLikeIndividual = async (req:Request, res:Response) => {
@@ -44,16 +56,16 @@ res.json(likes)
 }
 
 export const borrarLikes = async (req:Request, res:Response) => {
-    const fallecidoId = req.params;
-    const usuarioId = req.body
+    const fallecidoId = req.params.fallecidoId;
+    const usuarioId = req.params.usuarioId;
     console.log(usuarioId)
 
     const likes = await Likes.findOne( 
         {
-            where: {usuarioId : usuarioId},
+            where: {usuarioId : usuarioId, fallecidoId:fallecidoId},
         }
 )
 
 await likes?.destroy()
-
+res.json(likes)
 }

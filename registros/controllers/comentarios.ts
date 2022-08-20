@@ -17,10 +17,8 @@ export const obtenerComentarioIndividual = async (req:Request, res:Response) => 
     const comentarios = await Comentario.findAll( {where: {fallecidoId:fallecidoId}} );
 
     try {
-    if (!fallecidoId){
        res.json(comentarios) 
-}
-return res.json(comentarios) 
+
 
 } catch (error) {
     console.log(error)
@@ -35,10 +33,28 @@ export const obtenerComentarios = async (req:Request, res:Response) => {
     console.log(fallecidoId)
 
     const comentarios = await Comentario.findAll( 
-        /* {
-            where: {fallecidoId : fallecidoId},
-        } */
+    
 )
 res.json(comentarios)
 
+}
+
+export const deleteComentario = async (req:Request, res:Response) => {
+    const {id} = req.params
+
+    const comentario = await Comentario.findByPk(id)
+
+    try { 
+        
+        comentario?.destroy()
+        res.json(comentario) 
+ 
+ 
+ } catch (error) {
+     console.log(error)
+     res.status(500).json({
+         msg: `Hable con el Administrador`
+     })
+      }
+   
 }
