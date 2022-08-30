@@ -93,7 +93,7 @@ export const getFallecido = async (req: Request, res: Response) => {
 
 export const postFallecidos = async (req: Request, res: Response) => {
 
-    const body = req.body
+    const {body} = req
     console.log(body)
 
     try {

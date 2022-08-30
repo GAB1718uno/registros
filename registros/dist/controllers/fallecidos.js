@@ -82,7 +82,7 @@ const getFallecido = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.getFallecido = getFallecido;
 const postFallecidos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
+    const { body } = req;
     console.log(body);
     try {
         const fallecidos = fallecido_1.default.build(body);

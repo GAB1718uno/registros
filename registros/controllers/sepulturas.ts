@@ -86,7 +86,7 @@ export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
                 })
             }
 
-            sepultura.avatar = nombreArchivo;
+            body.avatar = nombreArchivo;
     
             await sepultura.update( body );
             res.json(sepultura)

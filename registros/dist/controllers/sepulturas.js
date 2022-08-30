@@ -80,7 +80,7 @@ const actualizarSepultura = (req, res) => __awaiter(void 0, void 0, void 0, func
                 msg: 'No existe sepultura con el ID'
             });
         }
-        sepultura.avatar = nombreArchivo;
+        body.avatar = nombreArchivo;
         yield sepultura.update(body);
         res.json(sepultura);
     }
