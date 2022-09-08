@@ -16,7 +16,7 @@ export const crearFile = async (req: Request, res: Response) => {
 
     //Validamos que el tipo sea correcto
     if (!tiposValidos.includes(tipo)) {
-        res.status(400).json({
+        return res.status(400).json({
             ok: false,
             msg: ' El tipo de archivo no es correcto'
         })
@@ -52,6 +52,8 @@ export const crearFile = async (req: Request, res: Response) => {
 
     //path de archivo
     const path = `./uploads/${tipo}/${nombreArchivo}`;
+    //const path = `http://167.71.36.17:3000/uploads/${tipo}/${nombreArchivo}`;
+
 
     //Mover
     // Use the mv() method to place the file somewhere on your server
@@ -64,12 +66,12 @@ export const crearFile = async (req: Request, res: Response) => {
                 })
         }
 
-        res.status(200).json(
+        /* res.status(200).json(
             {
                 ok: true,
                 id,
                 nombreArchivo
-            });
+            }); */
     });
 
 
@@ -105,7 +107,7 @@ export const crearFile = async (req: Request, res: Response) => {
     
                 })
             console.log(sepultura)
-
+            //return true;
             break;
 
         default:
@@ -122,7 +124,7 @@ export const actualizarFile = (req: Request, res: Response) => {
 
     //Validamos que el tipo sea correcto
     if (!tiposValidos.includes(tipo)) {
-        res.status(400).json({
+        return res.status(400).json({
             ok: false,
             msg: ' El tipo de archivo no es correcto'
         })
@@ -171,12 +173,12 @@ export const actualizarFile = (req: Request, res: Response) => {
                 })
         }
 
-        res.status(200).json(
+        /* res.status(200).json(
             {
                 ok: true,
                 id,
                 nombreArchivo
-            });
+            }); */
     });
 
     actualizarImagen(id, tipo, nombreArchivo)
@@ -198,17 +200,15 @@ export const borramosDatosFile = async (req: Request, res: Response) => {
     }
 
     await fallecidoFiles.destroy();
-    res.json(fallecidoFiles)
-
-
-
-
+    return res.json(fallecidoFiles)
 
 }
+
+
 export const mostrarDatosFile = async (req: Request, res: Response) => {
 
     const fallecidosUploads = await Uploads.findAll();
-    res.json(fallecidosUploads)
+    return res.json(fallecidosUploads)
 
 }
 
@@ -225,11 +225,11 @@ export const mostrarFile = (req: Request, res: Response) => {
 
 
     if (fs.existsSync(pathFileCortado)) {
-        res.sendFile(pathFileCortado);
+        return res.sendFile(pathFileCortado);
     } else {
         const pathFile = path.join(__dirname, `../uploads/no-image.png`);
         const pathFileCortado = pathFile.replace('dist', '')
-        res.sendFile(pathFileCortado);
+        return res.sendFile(pathFileCortado);
     }
 
 

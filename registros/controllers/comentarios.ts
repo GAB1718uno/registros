@@ -58,3 +58,16 @@ export const deleteComentario = async (req:Request, res:Response) => {
       }
    
 }
+
+export const borrarTodosComentarios = async (req:Request, res:Response) => {
+    const fallecidoId = req.params.fallecidoId;
+
+    const comentarios = await Comentario.findOne( 
+        {
+            where: { fallecidoId:fallecidoId },
+        }
+)
+
+await comentarios?.destroy()
+return res.json(comentarios)
+}

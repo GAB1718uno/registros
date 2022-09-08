@@ -25,7 +25,7 @@ const crearFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const tiposValidos = ['usuarios', 'fallecidos', 'sepulturas'];
     //Validamos que el tipo sea correcto
     if (!tiposValidos.includes(tipo)) {
-        res.status(400).json({
+        return res.status(400).json({
             ok: false,
             msg: ' El tipo de archivo no es correcto'
         });
@@ -55,6 +55,7 @@ const crearFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(nombreArchivo);
     //path de archivo
     const path = `./uploads/${tipo}/${nombreArchivo}`;
+    //const path = `http://167.71.36.17:3000/uploads/${tipo}/${nombreArchivo}`;
     //Mover
     // Use the mv() method to place the file somewhere on your server
     file.mv(path, (err) => {
@@ -64,11 +65,12 @@ const crearFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 err
             });
         }
-        res.status(200).json({
-            ok: true,
-            id,
-            nombreArchivo
-        });
+        /* res.status(200).json(
+            {
+                ok: true,
+                id,
+                nombreArchivo
+            }); */
     });
     body.tipo = tipo;
     body.avatar = nombreArchivo;
@@ -97,6 +99,7 @@ const crearFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 body
             });
             console.log(sepultura);
+            //return true;
             break;
         default:
             break;
@@ -109,7 +112,7 @@ const actualizarFile = (req, res) => {
     const tiposValidos = ['usuarios', 'fallecidos', 'sepulturas'];
     //Validamos que el tipo sea correcto
     if (!tiposValidos.includes(tipo)) {
-        res.status(400).json({
+        return res.status(400).json({
             ok: false,
             msg: ' El tipo de archivo no es correcto'
         });
@@ -147,11 +150,12 @@ const actualizarFile = (req, res) => {
                 err
             });
         }
-        res.status(200).json({
-            ok: true,
-            id,
-            nombreArchivo
-        });
+        /* res.status(200).json(
+            {
+                ok: true,
+                id,
+                nombreArchivo
+            }); */
     });
     (0, actualizar_imagen_1.default)(id, tipo, nombreArchivo);
 };
@@ -167,12 +171,12 @@ const borramosDatosFile = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
     yield fallecidoFiles.destroy();
-    res.json(fallecidoFiles);
+    return res.json(fallecidoFiles);
 });
 exports.borramosDatosFile = borramosDatosFile;
 const mostrarDatosFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const fallecidosUploads = yield uploads_1.default.findAll();
-    res.json(fallecidosUploads);
+    return res.json(fallecidosUploads);
 });
 exports.mostrarDatosFile = mostrarDatosFile;
 const mostrarFile = (req, res) => {
@@ -181,12 +185,12 @@ const mostrarFile = (req, res) => {
     const pathFile = path_1.default.join(__dirname, `../uploads/${tipo}/${archivo}`);
     const pathFileCortado = pathFile.replace('dist', '');
     if (fs_1.default.existsSync(pathFileCortado)) {
-        res.sendFile(pathFileCortado);
+        return res.sendFile(pathFileCortado);
     }
     else {
         const pathFile = path_1.default.join(__dirname, `../uploads/no-image.png`);
         const pathFileCortado = pathFile.replace('dist', '');
-        res.sendFile(pathFileCortado);
+        return res.sendFile(pathFileCortado);
     }
 };
 exports.mostrarFile = mostrarFile;

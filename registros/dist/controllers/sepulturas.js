@@ -23,11 +23,11 @@ const obtenerFallecidosSepultura = (req, res) => __awaiter(void 0, void 0, void 
         const fallecidossepultura = yield fallecido_1.default.findAll({
             where: { sepulturaId: id }
         });
-        res.json(fallecidossepultura);
+        return res.json(fallecidossepultura);
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         });
     }
@@ -59,12 +59,23 @@ const actualizarSepultura = (req, res) => __awaiter(void 0, void 0, void 0, func
     const nombreArchivo = `${(0, uuid_1.v4)()}.${extensionArchivo}`;
     console.log(file);
     console.log(nombreArchivo);
+    const filename = nombreArchivo;
     //path de archivo
     const tipo = req.body.tipo;
-    const path = `./uploads/${tipo}/${nombreArchivo}`;
+    const path = `./uploads/${tipo}/`; //${nombreArchivo}
     //Mover
     // Use the mv() method to place the file somewhere on your server
-    file.mv(path, (err) => {
+    /* file.mv(path, (err: any) => {
+        if (err) {
+            return res.status(500).json(
+                {
+                    ok: false,
+                    err
+                })
+        }
+
+    }); */
+    file.mv(path + filename, (err) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -74,6 +85,7 @@ const actualizarSepultura = (req, res) => __awaiter(void 0, void 0, void 0, func
     });
     try {
         const sepultura = yield sepultura_1.default.findByPk(id);
+        console.log(sepultura);
         if (!sepultura) {
             return res.status(404).json({
                 ok: false,
@@ -82,11 +94,11 @@ const actualizarSepultura = (req, res) => __awaiter(void 0, void 0, void 0, func
         }
         body.avatar = nombreArchivo;
         yield sepultura.update(body);
-        res.json(sepultura);
+        return res.json(sepultura);
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         });
     }
@@ -121,6 +133,8 @@ const crearSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function*
     //path de archivo
     const tipo = req.body.tipo;
     const path = `./uploads/${tipo}/${nombreArchivo}`;
+    //const path = `http://167.71.36.17:3000/uploads/${tipo}/${nombreArchivo}`;
+    console.log(path);
     //Mover
     // Use the mv() method to place the file somewhere on your server
     file.mv(path, (err) => {
@@ -140,7 +154,7 @@ const crearSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         });
     }
@@ -165,7 +179,7 @@ const deleteSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function
             fs_1.default.unlinkSync(path);
         }
         yield sepultura.destroy();
-        res.json({
+        return res.json({
             ok: true,
             msg: 'Se ha eliminado de la Base de Datos lo abajo especificado: ',
             sepultura
@@ -173,7 +187,7 @@ const deleteSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         });
     }
@@ -188,11 +202,11 @@ const obtenerSepulturas = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 msg: 'No existe sepulturas en la Base de Datos'
             });
         }
-        res.json(sepultura);
+        return res.json(sepultura);
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         });
     }
@@ -208,11 +222,11 @@ const obtenerSepultura = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 msg: 'No existe usuario con el ID: ' + id
             });
         }
-        res.json(sepultura);
+        return res.json(sepultura);
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         });
     }

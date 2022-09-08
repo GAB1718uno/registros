@@ -14,11 +14,11 @@ export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
                 where: {sepulturaId:id}
             }
         )
-        res.json(fallecidossepultura)
+        return res.json(fallecidossepultura)
    
    } catch (error) {
         console.log(error)
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         })
          }
@@ -58,14 +58,26 @@ export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
 
     console.log(file)
     console.log(nombreArchivo)
+    const filename = nombreArchivo;
 
     //path de archivo
     const tipo = req.body.tipo
-    const path = `./uploads/${tipo}/${nombreArchivo}`;
+    const path = `./uploads/${tipo}/`; //${nombreArchivo}
 
     //Mover
     // Use the mv() method to place the file somewhere on your server
-    file.mv(path, (err: any) => {
+    /* file.mv(path, (err: any) => {
+        if (err) {
+            return res.status(500).json(
+                {
+                    ok: false,
+                    err
+                })
+        }
+
+    }); */
+
+    file.mv(path + filename, (err: any) => {
         if (err) {
             return res.status(500).json(
                 {
@@ -79,6 +91,7 @@ export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
         try {
     
             const sepultura = await Sepultura.findByPk( id );
+            console.log(sepultura);
             if(!sepultura){
                 return res.status(404).json({
                     ok: false,
@@ -89,12 +102,12 @@ export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
             body.avatar = nombreArchivo;
     
             await sepultura.update( body );
-            res.json(sepultura)
+            return res.json(sepultura)
         
     
         } catch (error) {
             console.log(error)
-            res.status(500).json({
+           return res.status(500).json({
                 msg: `Hable con el Administrador`
             })
             
@@ -141,6 +154,9 @@ export const crearSepultura = async (req:any, res:any) => {
     //path de archivo
     const tipo = req.body.tipo
     const path = `./uploads/${tipo}/${nombreArchivo}`;
+    //const path = `http://167.71.36.17:3000/uploads/${tipo}/${nombreArchivo}`;
+    console.log(path);
+
 
     //Mover
     // Use the mv() method to place the file somewhere on your server
@@ -168,7 +184,7 @@ export const crearSepultura = async (req:any, res:any) => {
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         })
 
@@ -201,7 +217,7 @@ export const deleteSepultura = async (req: Request, res: Response) => {
         }
         
         await sepultura.destroy();
-       res.json({
+       return res.json({
            ok:true,
            msg:'Se ha eliminado de la Base de Datos lo abajo especificado: ',
            sepultura
@@ -209,7 +225,7 @@ export const deleteSepultura = async (req: Request, res: Response) => {
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         });
     }
@@ -226,10 +242,10 @@ export const obtenerSepulturas = async (req:Request, res:Response) => {
                 msg: 'No existe sepulturas en la Base de Datos'
             })
         }
-        res.json(sepultura)
+        return res.json(sepultura)
     } catch (error) {
         console.log(error)
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         });
         
@@ -250,11 +266,11 @@ export const obtenerSepultura = async (req: Request, res: Response) => {
             })
         }
 
-       res.json(sepultura)
+       return res.json(sepultura)
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Hable con el Administrador`
         });
     }

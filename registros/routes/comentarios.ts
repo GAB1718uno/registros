@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { crearComentarios, obtenerComentarioIndividual, obtenerComentarios, deleteComentario } from '../controllers/comentarios';
+import { crearComentarios, obtenerComentarioIndividual, obtenerComentarios, deleteComentario, borrarTodosComentarios } from '../controllers/comentarios';
 
 const router = Router();
 
@@ -17,6 +17,8 @@ router.get('/:fallecidoId', obtenerComentarioIndividual)
 
 router.post('/', crearComentarios ) //[ validarJwt ],
 
-router.delete('/:id', deleteComentario)
+router.delete('/:fallecidoId', borrarTodosComentarios)
+
+router.delete('/:id/usuario', deleteComentario)
 
 export default router;

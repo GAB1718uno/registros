@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteComentario = exports.obtenerComentarios = exports.obtenerComentarioIndividual = exports.crearComentarios = void 0;
+exports.borrarTodosComentarios = exports.deleteComentario = exports.obtenerComentarios = exports.obtenerComentarioIndividual = exports.crearComentarios = void 0;
 const comentario_1 = __importDefault(require("../models/comentario"));
 const crearComentarios = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
@@ -57,4 +57,13 @@ const deleteComentario = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.deleteComentario = deleteComentario;
+const borrarTodosComentarios = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const fallecidoId = req.params.fallecidoId;
+    const comentarios = yield comentario_1.default.findOne({
+        where: { fallecidoId: fallecidoId },
+    });
+    yield (comentarios === null || comentarios === void 0 ? void 0 : comentarios.destroy());
+    return res.json(comentarios);
+});
+exports.borrarTodosComentarios = borrarTodosComentarios;
 //# sourceMappingURL=comentarios.js.map
