@@ -86,7 +86,10 @@ class Server {
         this.app.use(body_parser_1.default.json({ limit: '50mb' }));
         this.app.use(body_parser_1.default.urlencoded({ extended: true, limit: '50mb' }));
         //Carga de uploads de archivos
-        this.app.use((0, express_fileupload_1.default)());
+        this.app.use((0, express_fileupload_1.default)({
+            useTempFiles: true,
+            tempFileDir: '/tmp/'
+        }));
         //Carpeta publica
         this.app.use(express_1.default.static('public'));
     }

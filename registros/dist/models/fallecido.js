@@ -33,14 +33,5 @@ const Fallecido = connection_1.default.define('Fallecido', {
 }, {
     tableName: 'muertos',
 });
-/* Fallecido.hasMany(Likes, {
-    foreignKey:'contador',
-    sourceKey:'id'
-})
-
-Likes.belongsTo(Fallecido, {
-    foreignKey:'valor',
-    targetKey:'id'
-}) */
 exports.default = Fallecido;
 //# sourceMappingURL=fallecido.js.map

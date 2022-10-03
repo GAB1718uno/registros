@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.obtenerSepultura = exports.obtenerSepulturas = exports.deleteSepultura = exports.crearSepultura = exports.actualizarSepultura = exports.obtenerFallecidosSepultura = void 0;
+exports.obtenerSepultura = exports.obtenerSepulturas = exports.deleteSepultura = exports.crearSepultura = exports.actualizarSepulturaCloudinary = exports.actualizarSepultura = exports.obtenerFallecidosSepultura = void 0;
 const uuid_1 = require("uuid");
 const sepultura_1 = __importDefault(require("../models/sepultura"));
 const fallecido_1 = __importDefault(require("../models/fallecido"));
@@ -62,20 +62,10 @@ const actualizarSepultura = (req, res) => __awaiter(void 0, void 0, void 0, func
     const filename = nombreArchivo;
     //path de archivo
     const tipo = req.body.tipo;
-    const path = `./uploads/${tipo}/`; //${nombreArchivo}
+    const path = `./uploads/${tipo}/${nombreArchivo}`;
     //Mover
     // Use the mv() method to place the file somewhere on your server
-    /* file.mv(path, (err: any) => {
-        if (err) {
-            return res.status(500).json(
-                {
-                    ok: false,
-                    err
-                })
-        }
-
-    }); */
-    file.mv(path + filename, (err) => {
+    file.mv(path, (err) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -104,6 +94,67 @@ const actualizarSepultura = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.actualizarSepultura = actualizarSepultura;
+const actualizarSepulturaCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { body } = req;
+    const { id } = req.params;
+    //Validamos que exista un archivo en envio
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'No files were uploaded.'
+        });
+    }
+    //Procesar archivo
+    const file = req.files.file;
+    console.log(file);
+    const fileCortado = file.name.split('.');
+    const extensionArchivo = fileCortado[fileCortado.length - 1];
+    const extensionesValidas = ['png', 'jpg', 'jpeg', 'svg', 'gif'];
+    if (!extensionesValidas.includes(extensionArchivo)) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'Extension de archivo no permitida'
+        });
+    }
+    //Generar nombre del archivo
+    const nombreArchivo = `${(0, uuid_1.v4)()}.${extensionArchivo}`;
+    console.log(file);
+    console.log(nombreArchivo);
+    const filename = nombreArchivo;
+    //path de archivo
+    const tipo = req.body.tipo;
+    const path = `./uploads/${tipo}/${nombreArchivo}`;
+    //Mover
+    // Use the mv() method to place the file somewhere on your server
+    file.mv(path, (err) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+    });
+    try {
+        const sepultura = yield sepultura_1.default.findByPk(id);
+        console.log(sepultura);
+        if (!sepultura) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'No existe sepultura con el ID'
+            });
+        }
+        body.avatar = nombreArchivo;
+        yield sepultura.update(body);
+        return res.json(sepultura);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            msg: `Hable con el Administrador`
+        });
+    }
+});
+exports.actualizarSepulturaCloudinary = actualizarSepulturaCloudinary;
 const crearSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     console.log(body);
@@ -144,6 +195,10 @@ const crearSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 err
             });
         }
+        res.status(200).json({
+            ok: true,
+            msg: 'Archivo Creado con exito'
+        });
     });
     body.tipo = tipo;
     body.avatar = nombreArchivo;

@@ -104,7 +104,10 @@ class Server {
         this.app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
         //Carga de uploads de archivos
-        this.app.use(fileUpload());
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/'
+        }));
 
     
         //Carpeta publica

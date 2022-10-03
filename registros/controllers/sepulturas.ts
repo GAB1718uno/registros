@@ -3,6 +3,8 @@ import Sepultura from '../models/sepultura';
 import Fallecido from '../models/fallecido';
 import { Request, Response } from "express";
 import fs from "fs";
+import path from 'path';
+import { actualizarFileCloudinary } from './uploads';
 
 export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
     const {id} = req.params;
@@ -62,11 +64,11 @@ export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
 
     //path de archivo
     const tipo = req.body.tipo
-    const path = `./uploads/${tipo}/`; //${nombreArchivo}
+    const path = `./uploads/${tipo}/${nombreArchivo}`;
 
     //Mover
     // Use the mv() method to place the file somewhere on your server
-    /* file.mv(path, (err: any) => {
+    file.mv(path, (err: any) => {
         if (err) {
             return res.status(500).json(
                 {
@@ -75,9 +77,79 @@ export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
                 })
         }
 
-    }); */
+    });
+    
+        try {
+    
+            const sepultura = await Sepultura.findByPk( id );
+            console.log(sepultura);
+            if(!sepultura){
+                return res.status(404).json({
+                    ok: false,
+                    msg: 'No existe sepultura con el ID'
+                })
+            }
 
-    file.mv(path + filename, (err: any) => {
+            body.avatar = nombreArchivo;
+    
+            await sepultura.update( body );
+            return res.json(sepultura)
+        
+    
+        } catch (error) {
+            console.log(error)
+           return res.status(500).json({
+                msg: `Hable con el Administrador`
+            })
+            
+        }
+
+
+
+     } 
+
+     export const actualizarSepulturaCloudinary = async (req:any, res:any) => {
+
+        
+        const { body } = req;
+        const { id } = req.params;
+
+            //Validamos que exista un archivo en envio
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'No files were uploaded.'
+        });
+    }
+
+    //Procesar archivo
+    const file: any = req.files.file;
+    console.log(file)
+    const fileCortado = file.name.split('.');
+    const extensionArchivo = fileCortado[fileCortado.length - 1]
+    const extensionesValidas = ['png', 'jpg', 'jpeg', 'svg', 'gif']
+
+    if (!extensionesValidas.includes(extensionArchivo)) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'Extension de archivo no permitida'
+        });
+    }
+
+    //Generar nombre del archivo
+    const nombreArchivo = `${v4()}.${extensionArchivo}`;
+
+    console.log(file)
+    console.log(nombreArchivo)
+    const filename = nombreArchivo;
+
+    //path de archivo
+    const tipo = req.body.tipo
+    const path = `./uploads/${tipo}/${nombreArchivo}`;
+
+    //Mover
+    // Use the mv() method to place the file somewhere on your server
+    file.mv(path, (err: any) => {
         if (err) {
             return res.status(500).json(
                 {
@@ -168,6 +240,11 @@ export const crearSepultura = async (req:any, res:any) => {
                     err
                 })
         }
+
+        res.status(200).json({
+            ok:true,
+            msg:'Archivo Creado con exito' 
+        })
 
     });
 

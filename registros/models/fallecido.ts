@@ -48,14 +48,4 @@ const Fallecido = db.define<IFallecido>('Fallecido', {
 
 );
 
-/* Fallecido.hasMany(Likes, {
-    foreignKey:'contador',
-    sourceKey:'id'
-})
-
-Likes.belongsTo(Fallecido, {
-    foreignKey:'valor',
-    targetKey:'id'
-}) */
-
 export default Fallecido;

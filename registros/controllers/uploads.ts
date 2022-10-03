@@ -1,9 +1,26 @@
 import { Request, Response } from "express";
 import { v4 } from "uuid";
 import actualizarImagen from "../helpers/actualizar-imagen";
+import actualizarImagenCloudinary from "../helpers/actualizar-imagen-cloudinary";
 import fs from "fs";
-import path from "path";
+import * as path from 'path';
 import Uploads from "../models/uploads";
+import { v2 as cloudinary } from 'cloudinary'
+import { validarExtensionCorte } from "../helpers/validarExtensionCorte";
+import Sepultura from '../models/sepultura';
+  
+/* cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_KEY,
+    api_secret: process.env.CLOUD_SECRET,
+  }); */
+  cloudinary.config({ 
+    cloud_name: 'ddxm1pvmd', 
+    api_key: '934857619637733', 
+    api_secret: 'XXiAdEkOs6933Qgm-whY52pwNyc' 
+  });
+//cloudinary.config(process.env.CLOUDINARY_URL!)
+
 
 
 export const crearFile = async (req: Request, res: Response) => {
@@ -51,13 +68,14 @@ export const crearFile = async (req: Request, res: Response) => {
     console.log(nombreArchivo)
 
     //path de archivo
-    const path = `./uploads/${tipo}/${nombreArchivo}`;
+    const elpath = path.join(__dirname, `../../uploads/${tipo}/${nombreArchivo}`);
     //const path = `http://167.71.36.17:3000/uploads/${tipo}/${nombreArchivo}`;
+    console.log(elpath)
 
 
     //Mover
     // Use the mv() method to place the file somewhere on your server
-    file.mv(path, (err: any) => {
+    file.mv(elpath, (err: any) => {
         if (err) {
             return res.status(500).json(
                 {
@@ -113,6 +131,52 @@ export const crearFile = async (req: Request, res: Response) => {
         default:
             break;
     }
+}
+
+export const crearFileCloudinary = async (req: Request, res: Response) => {
+
+    const body = req.body
+    const tipo = req.params.tipo;
+    
+    // Procesar la carga de la imagen
+    const file: any = req.files?.file;
+
+    const validando = validarExtensionCorte(file)
+    if (!validando){
+        console.log('llego hasta aqui')
+        res.status(404).json({
+            ok:true,
+            msg: 'La extension no es válida'
+        })
+    } else {
+
+        //actualizarImagenCloudinary(id, tipo, nombreArchivo, body)
+        
+        
+        try {
+            
+            //Cloudinary comprobar path y nombre
+            const tempFilePath:any = req.files?.file;
+            console.log(tempFilePath.tempFilePath)
+            const {secure_url} = await cloudinary.uploader.upload(tempFilePath.tempFilePath)
+            body.avatar = secure_url
+            
+            const sepultura = Sepultura.build(body)
+        await sepultura.save();
+        console.log('Sepultura creada en base de datos y archivo en Cloudinary')
+        res.json(sepultura)
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            msg: `Hable con el Administrador`
+        })
+
+    }
+}
+
+
+
 }
 
 export const actualizarFile = (req: Request, res: Response) => {
@@ -183,6 +247,37 @@ export const actualizarFile = (req: Request, res: Response) => {
 
     actualizarImagen(id, tipo, nombreArchivo)
 
+}
+
+export const actualizarFileCloudinary = async (req: Request, res: Response) => {
+    const body = req.body
+    const tipo = req.params.tipo;
+    const id = req.params.id;
+
+    // Procesar la carga de la imagen
+    const file: any = req.files?.file;
+
+    const validando = validarExtensionCorte(file)
+    if (!validando){
+        console.log('llego hasta aqui')
+        res.status(404).json({
+            ok:true,
+            msg: 'La extension no es válida'
+        })
+    } else {
+
+    //Cloudinary comprobar path y nombre
+    const tempFilePath:any = req.files?.file;
+    console.log(tempFilePath.tempFilePath)
+    const {secure_url} = await cloudinary.uploader.upload(tempFilePath.tempFilePath)
+    const nombreArchivo = secure_url
+    console.log(nombreArchivo)
+    
+    actualizarImagenCloudinary(id, tipo, nombreArchivo, body)
+    
+    res.json('por fi')
+
+}
 }
 
 
