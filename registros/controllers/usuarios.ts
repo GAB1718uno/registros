@@ -22,7 +22,7 @@ export const comprobarLogin = async (req:Request, res:Response) => {
         })
     }
 
-    const validPassword = await bcrypt.compare( password, usuario.password )
+    const validPassword = await bcrypt.compare( password, usuario.password! )
     /* console.log(password)
     console.log(usuario.password)
     console.log(validPassword) */

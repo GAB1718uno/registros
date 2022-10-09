@@ -1,18 +1,10 @@
 import { Request, Response } from "express";
 import { Op } from "sequelize";
+import { validarExtensionCorte } from "../helpers/validarExtensionCorte";
 import Fallecido from "../models/fallecido";
 import Sepultura from "../models/sepultura"
-
-/* export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
-    const {id} = req.params;
-
-    const fallecidossepultura = await Fallecido.findAll(
-        {
-            where: {sepultId:id}
-        }
-    )
-    res.json(fallecidossepultura)
-} */
+import { v2 as cloudinary } from 'cloudinary'
+import actualizarImagenCloudinary from "../helpers/actualizar-imagen-cloudinary";
 
 export const obtenerRelacionado = async (req:Request, res:Response) => {
 
@@ -91,6 +83,48 @@ export const getFallecido = async (req: Request, res: Response) => {
 
 }
 
+export const crearFallecidoCloudinary = async (req: Request, res: Response) => {
+
+    const body = req.body
+    const tipo = 'fallecidos'    
+    // Procesar la carga de la imagen
+    const file: any = req.files?.file;
+
+    const validando = validarExtensionCorte(file)
+    if (!validando){
+        console.log('llego hasta aqui')
+        res.status(404).json({
+            ok:true,
+            msg: 'La extension no es válida'
+        })
+    } else {
+
+        try {
+            
+            //Cloudinary comprobar path y nombre
+            const tempFilePath:any = req.files?.file;
+            console.log(tempFilePath.tempFilePath)
+            const {secure_url} = await cloudinary.uploader.upload(tempFilePath.tempFilePath)
+            body.url = secure_url
+            
+            const fallecido = Fallecido.build(body)
+        await fallecido.save();
+        console.log('Fallecido creado en base de datos y archivo en Cloudinary')
+        res.json(fallecido)
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            msg: `Hable con el Administrador`
+        })
+
+    }
+}
+
+
+
+}
+
 export const postFallecidos = async (req: Request, res: Response) => {
 
     const {body} = req
@@ -109,6 +143,38 @@ export const postFallecidos = async (req: Request, res: Response) => {
         })
 
     }
+}
+
+
+export const actualizarFallecidoCloudinary = async (req: Request, res: Response) => {
+    const body = req.body
+    const tipo = req.params.tipo;
+    const id = req.params.id;
+
+    // Procesar la carga de la imagen
+    const file: any = req.files?.file;
+    console.log(file);
+    
+
+    const validando = validarExtensionCorte(file)
+    if (!validando){
+        console.log('llego hasta aqui')
+        res.status(404).json({
+            ok:true,
+            msg: 'La extension no es válida'
+        })
+    } else {
+
+    //Cloudinary comprobar path y nombre
+    const tempFilePath:any = req.files?.file;
+    const {secure_url} = await cloudinary.uploader.upload(tempFilePath.tempFilePath)
+    const nombreArchivo = secure_url
+    
+    actualizarImagenCloudinary(id, tipo, nombreArchivo, body)
+    
+    res.json('por fi')
+
+}
 }
 
 export const putFallecido = async (req: Request, res: Response) => {

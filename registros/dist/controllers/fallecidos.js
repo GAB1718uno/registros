@@ -12,19 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteFallecido = exports.putFallecido = exports.postFallecidos = exports.getFallecido = exports.getFallecidos = exports.getFallecidosCriba = exports.obtenerRelacionado = void 0;
+exports.deleteFallecido = exports.putFallecido = exports.actualizarFallecidoCloudinary = exports.postFallecidos = exports.crearFallecidoCloudinary = exports.getFallecido = exports.getFallecidos = exports.getFallecidosCriba = exports.obtenerRelacionado = void 0;
 const sequelize_1 = require("sequelize");
+const validarExtensionCorte_1 = require("../helpers/validarExtensionCorte");
 const fallecido_1 = __importDefault(require("../models/fallecido"));
-/* export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
-    const {id} = req.params;
-
-    const fallecidossepultura = await Fallecido.findAll(
-        {
-            where: {sepultId:id}
-        }
-    )
-    res.json(fallecidossepultura)
-} */
+const cloudinary_1 = require("cloudinary");
+const actualizar_imagen_cloudinary_1 = __importDefault(require("../helpers/actualizar-imagen-cloudinary"));
 const obtenerRelacionado = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { sepult } = req.params;
     console.log(sepult);
@@ -81,6 +74,41 @@ const getFallecido = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     res.json(fallecidos);
 });
 exports.getFallecido = getFallecido;
+const crearFallecidoCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const body = req.body;
+    const tipo = 'fallecidos';
+    // Procesar la carga de la imagen
+    const file = (_a = req.files) === null || _a === void 0 ? void 0 : _a.file;
+    const validando = (0, validarExtensionCorte_1.validarExtensionCorte)(file);
+    if (!validando) {
+        console.log('llego hasta aqui');
+        res.status(404).json({
+            ok: true,
+            msg: 'La extension no es válida'
+        });
+    }
+    else {
+        try {
+            //Cloudinary comprobar path y nombre
+            const tempFilePath = (_b = req.files) === null || _b === void 0 ? void 0 : _b.file;
+            console.log(tempFilePath.tempFilePath);
+            const { secure_url } = yield cloudinary_1.v2.uploader.upload(tempFilePath.tempFilePath);
+            body.url = secure_url;
+            const fallecido = fallecido_1.default.build(body);
+            yield fallecido.save();
+            console.log('Fallecido creado en base de datos y archivo en Cloudinary');
+            res.json(fallecido);
+        }
+        catch (error) {
+            console.log(error);
+            res.status(500).json({
+                msg: `Hable con el Administrador`
+            });
+        }
+    }
+});
+exports.crearFallecidoCloudinary = crearFallecidoCloudinary;
 const postFallecidos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
     console.log(body);
@@ -98,6 +126,32 @@ const postFallecidos = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.postFallecidos = postFallecidos;
+const actualizarFallecidoCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c, _d;
+    const body = req.body;
+    const tipo = req.params.tipo;
+    const id = req.params.id;
+    // Procesar la carga de la imagen
+    const file = (_c = req.files) === null || _c === void 0 ? void 0 : _c.file;
+    console.log(file);
+    const validando = (0, validarExtensionCorte_1.validarExtensionCorte)(file);
+    if (!validando) {
+        console.log('llego hasta aqui');
+        res.status(404).json({
+            ok: true,
+            msg: 'La extension no es válida'
+        });
+    }
+    else {
+        //Cloudinary comprobar path y nombre
+        const tempFilePath = (_d = req.files) === null || _d === void 0 ? void 0 : _d.file;
+        const { secure_url } = yield cloudinary_1.v2.uploader.upload(tempFilePath.tempFilePath);
+        const nombreArchivo = secure_url;
+        (0, actualizar_imagen_cloudinary_1.default)(id, tipo, nombreArchivo, body);
+        res.json('por fi');
+    }
+});
+exports.actualizarFallecidoCloudinary = actualizarFallecidoCloudinary;
 const putFallecido = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
     const { id } = req.params;

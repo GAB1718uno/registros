@@ -37,8 +37,9 @@ export interface IUser extends Model {
   rol?:string,
   estado?:number,
   usuario?: string,
-  password: string,
+  password?: string,
   email?: string,
+  avatar?:string,
   createdAt?:string,
   updateAt?: string
 }
@@ -52,12 +53,21 @@ const Usuario = db.define<IUser>('Usuario', {
     usuario: {
         type: DataTypes.STRING
     },
+    email: {
+      type: DataTypes.STRING
+    },
     password: {
         type: DataTypes.STRING
     },
-    email: {
-        type: DataTypes.STRING
+    rol: {
+      type:DataTypes.STRING
     },
+    estado: {
+      type:DataTypes.STRING
+    },
+    avatar: {
+      type:DataTypes.STRING
+    }
   },
     {
       tableName:'usuarios',

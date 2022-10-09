@@ -5,6 +5,77 @@ import { Request, Response } from "express";
 import fs from "fs";
 import path from 'path';
 import { actualizarFileCloudinary } from './uploads';
+import { validarExtensionCorte } from '../helpers/validarExtensionCorte';
+import { v2 as cloudinary } from 'cloudinary'
+import { Op } from 'sequelize';
+
+export const obtenerSepulturaCribada = async (req: Request, res: Response) => {
+    
+    const busqueda = req.params.termino;
+
+    const sepulturas = await Sepultura.findAll(
+            {   limit:10,
+                where: { calle: {
+                    [Op.like]: '%'+ busqueda + '%'
+                } 
+            }}
+            )
+
+            
+
+            res.json(sepulturas)
+        
+        
+        /* res.status(400).json({
+            msg: `Hable con el Administrador`
+        }) */
+} 
+
+export const crearSepulturaCloudinary = async (req: Request, res: Response) => {
+
+    const body = req.body
+    const tipo = req.params.tipo;
+    
+    // Procesar la carga de la imagen
+    const file: any = req.files?.file;
+
+    const validando = validarExtensionCorte(file)
+    if (!validando){
+        console.log('llego hasta aqui')
+        res.status(404).json({
+            ok:true,
+            msg: 'La extension no es válida'
+        })
+    } else {
+
+        //actualizarImagenCloudinary(id, tipo, nombreArchivo, body)
+        
+        
+        try {
+            
+            //Cloudinary comprobar path y nombre
+            const tempFilePath:any = req.files?.file;
+            console.log(tempFilePath.tempFilePath)
+            const {secure_url} = await cloudinary.uploader.upload(tempFilePath.tempFilePath)
+            body.avatar = secure_url
+            
+            const sepultura = Sepultura.build(body)
+        await sepultura.save();
+        console.log('Sepultura creada en base de datos y archivo en Cloudinary')
+        res.json(sepultura)
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            msg: `Hable con el Administrador`
+        })
+
+    }
+}
+
+
+
+}
 
 export const obtenerFallecidosSepultura = async (req:Request, res:Response) => {
     const {id} = req.params;

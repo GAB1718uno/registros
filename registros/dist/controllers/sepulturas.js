@@ -12,11 +12,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.obtenerSepultura = exports.obtenerSepulturas = exports.deleteSepultura = exports.crearSepultura = exports.actualizarSepulturaCloudinary = exports.actualizarSepultura = exports.obtenerFallecidosSepultura = void 0;
+exports.obtenerSepultura = exports.obtenerSepulturas = exports.deleteSepultura = exports.crearSepultura = exports.actualizarSepulturaCloudinary = exports.actualizarSepultura = exports.obtenerFallecidosSepultura = exports.crearSepulturaCloudinary = exports.obtenerSepulturaCribada = void 0;
 const uuid_1 = require("uuid");
 const sepultura_1 = __importDefault(require("../models/sepultura"));
 const fallecido_1 = __importDefault(require("../models/fallecido"));
 const fs_1 = __importDefault(require("fs"));
+const validarExtensionCorte_1 = require("../helpers/validarExtensionCorte");
+const cloudinary_1 = require("cloudinary");
+const sequelize_1 = require("sequelize");
+const obtenerSepulturaCribada = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const busqueda = req.params.termino;
+    const sepulturas = yield sepultura_1.default.findAll({ limit: 10,
+        where: { calle: {
+                [sequelize_1.Op.like]: '%' + busqueda + '%'
+            }
+        } });
+    res.json(sepulturas);
+    /* res.status(400).json({
+        msg: `Hable con el Administrador`
+    }) */
+});
+exports.obtenerSepulturaCribada = obtenerSepulturaCribada;
+const crearSepulturaCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const body = req.body;
+    const tipo = req.params.tipo;
+    // Procesar la carga de la imagen
+    const file = (_a = req.files) === null || _a === void 0 ? void 0 : _a.file;
+    const validando = (0, validarExtensionCorte_1.validarExtensionCorte)(file);
+    if (!validando) {
+        console.log('llego hasta aqui');
+        res.status(404).json({
+            ok: true,
+            msg: 'La extension no es válida'
+        });
+    }
+    else {
+        //actualizarImagenCloudinary(id, tipo, nombreArchivo, body)
+        try {
+            //Cloudinary comprobar path y nombre
+            const tempFilePath = (_b = req.files) === null || _b === void 0 ? void 0 : _b.file;
+            console.log(tempFilePath.tempFilePath);
+            const { secure_url } = yield cloudinary_1.v2.uploader.upload(tempFilePath.tempFilePath);
+            body.avatar = secure_url;
+            const sepultura = sepultura_1.default.build(body);
+            yield sepultura.save();
+            console.log('Sepultura creada en base de datos y archivo en Cloudinary');
+            res.json(sepultura);
+        }
+        catch (error) {
+            console.log(error);
+            res.status(500).json({
+                msg: `Hable con el Administrador`
+            });
+        }
+    }
+});
+exports.crearSepulturaCloudinary = crearSepulturaCloudinary;
 const obtenerFallecidosSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
