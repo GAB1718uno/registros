@@ -22,7 +22,9 @@ const validarEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         }
     });
     if (existeEmail) {
+        console.log("Ya esxiste un usuario con este Email" + body.email);
         return res.status(400).json({
+            ok: false,
             msg: 'Ya existe un usuario con este email: ' + body.email
         });
     }

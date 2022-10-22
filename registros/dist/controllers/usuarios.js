@@ -128,6 +128,7 @@ const obtenerUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.obtenerUsuario = obtenerUsuario;
 const crearUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.body);
     try {
         const { body } = req;
         const salt = bcrypt.genSaltSync(10);
@@ -152,6 +153,7 @@ const crearUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         console.log(error);
         res.status(500).json({
             msg: `Hable con el Administrador`,
+            ok: false,
             error
         });
     }

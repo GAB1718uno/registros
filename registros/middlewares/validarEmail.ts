@@ -13,9 +13,13 @@ export const validarEmail = async (req:Request, res: Response, next:any) => {
     })
     
     if (existeEmail) {
+        console.log("Ya esxiste un usuario con este Email" + body.email);
+        
         return res.status(400).json(
             {
+                ok:false,
                 msg:'Ya existe un usuario con este email: ' + body.email
+
             }
         ) }
 

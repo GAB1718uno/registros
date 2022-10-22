@@ -130,7 +130,8 @@ export const obtenerUsuario = async (req: Request, res: Response) => {
 
 export const crearUsuario = async (req: Request, res: Response) => {
 
- 
+    console.log(req.body);
+    
     try {    
     const { body } = req;
     const salt = bcrypt.genSaltSync(10);
@@ -159,6 +160,7 @@ export const crearUsuario = async (req: Request, res: Response) => {
         console.log(error)
         res.status(500).json({
             msg: `Hable con el Administrador`,
+            ok:false,
             error
         })
         
