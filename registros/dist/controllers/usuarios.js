@@ -35,10 +35,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUsuario = exports.actualizarUsuario = exports.crearUsuario = exports.obtenerUsuario = exports.obtenerUsuarios = exports.revalidarToken = exports.comprobarLogin = void 0;
+exports.deleteUsuario = exports.actualizarUsuario = exports.crearUsuarioCloudinary = exports.crearUsuario = exports.obtenerUsuario = exports.obtenerUsuarios = exports.revalidarToken = exports.comprobarLogin = void 0;
 const usuario_1 = __importDefault(require("../models/usuario"));
 const bcrypt = __importStar(require("bcrypt"));
 const jwt_1 = __importDefault(require("../helpers/jwt"));
+const cloudinary_1 = require("cloudinary");
+const validarExtensionCorte_1 = require("../helpers/validarExtensionCorte");
 const comprobarLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     console.log(email, password);
@@ -62,7 +64,7 @@ const comprobarLogin = (req, res) => __awaiter(void 0, void 0, void 0, function*
             });
         }
         //Generando Token/* 
-        const token = yield (0, jwt_1.default)(usuario.id, usuario.usuario, usuario.email);
+        const token = yield (0, jwt_1.default)(usuario.id, usuario.usuario, usuario.email, usuario.avatar);
         return res.status(201).json({
             ok: true,
             msg: "Logueado con éxito",
@@ -86,14 +88,16 @@ const revalidarToken = (req, res) => __awaiter(void 0, void 0, void 0, function*
     const bdUser = yield usuario_1.default.findByPk(uid);
     const user = bdUser === null || bdUser === void 0 ? void 0 : bdUser.usuario;
     const ema = bdUser === null || bdUser === void 0 ? void 0 : bdUser.email;
+    const avatar = bdUser === null || bdUser === void 0 ? void 0 : bdUser.avatar;
     //Generando Token/* 
-    const token = yield (0, jwt_1.default)(uid, user, ema);
+    const token = yield (0, jwt_1.default)(uid, user, ema, avatar);
     res.status(201).json({
         ok: true,
         msg: 'Token renovado',
         uid: uid,
         name: user,
         email: ema,
+        avatar: avatar,
         token
     });
 });
@@ -139,7 +143,7 @@ const crearUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         await usuario.save(); */
         console.log(usuario.id);
         //Generando Token/* 
-        const token = yield (0, jwt_1.default)(usuario.id, usuario.usuario, usuario.email);
+        const token = yield (0, jwt_1.default)(usuario.id, usuario.usuario, usuario.email, usuario.avatar);
         console.log(token);
         res.status(201).json({
             ok: true,
@@ -159,6 +163,51 @@ const crearUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.crearUsuario = crearUsuario;
+const crearUsuarioCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    console.log(req.body);
+    const file = (_a = req.files) === null || _a === void 0 ? void 0 : _a.file;
+    const validarExtension = (0, validarExtensionCorte_1.validarExtensionCorte)(file);
+    if (!validarExtension) {
+        res.status(404).json({
+            ok: false,
+            msg: 'La extension del archivo no es válida'
+        });
+    }
+    else {
+        try {
+            const { body } = req;
+            const salt = bcrypt.genSaltSync(10);
+            req.body.password = bcrypt.hashSync(req.body.password, salt);
+            //Cloudinary comprobar path y nombre
+            const tempFilePath = (_b = req.files) === null || _b === void 0 ? void 0 : _b.file;
+            console.log(tempFilePath.tempFilePath);
+            const { secure_url } = yield cloudinary_1.v2.uploader.upload(tempFilePath.tempFilePath);
+            body.avatar = secure_url;
+            const usuario = yield usuario_1.default.create(body);
+            console.log(usuario.id);
+            //Generando Token/* 
+            const token = yield (0, jwt_1.default)(usuario.id, usuario.usuario, usuario.email, usuario.avatar);
+            console.log(token);
+            res.status(201).json({
+                ok: true,
+                msg: "Usuario creado con éxito",
+                uid: usuario.id,
+                email: usuario.email,
+                token
+            });
+        }
+        catch (error) {
+            console.log(error);
+            res.status(500).json({
+                msg: `Hable con el Administrador`,
+                ok: false,
+                error
+            });
+        }
+    }
+});
+exports.crearUsuarioCloudinary = crearUsuarioCloudinary;
 const actualizarUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
     const { id } = req.params;

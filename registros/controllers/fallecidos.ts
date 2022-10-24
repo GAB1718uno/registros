@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { Op } from "sequelize";
 import { validarExtensionCorte } from "../helpers/validarExtensionCorte";
 import Fallecido from "../models/fallecido";
-import Sepultura from "../models/sepultura"
 import { v2 as cloudinary } from 'cloudinary'
 import actualizarImagenCloudinary from "../helpers/actualizar-imagen-cloudinary";
 
@@ -94,7 +93,7 @@ export const crearFallecidoCloudinary = async (req: Request, res: Response) => {
     if (!validando){
         console.log('llego hasta aqui')
         res.status(404).json({
-            ok:true,
+            ok:false,
             msg: 'La extension no es válida'
         })
     } else {

@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const generarJwt = ( uid:any, usuario:any, email:any) => {
+const generarJwt = ( uid:any, usuario:any, email:any, avatar:any) => {
 
     const payload = {
         uid,

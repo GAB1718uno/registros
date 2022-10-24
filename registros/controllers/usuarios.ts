@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import Usuario from '../models/usuario';
 import * as bcrypt from 'bcrypt'
 import generarJwt from '../helpers/jwt';
+import { v2 as cloudinary } from 'cloudinary'
+import { validarExtensionCorte } from '../helpers/validarExtensionCorte';
 
 export const comprobarLogin = async (req:Request, res:Response) => {
 
@@ -34,7 +36,7 @@ export const comprobarLogin = async (req:Request, res:Response) => {
     }
 
       //Generando Token/* 
-  const token = await generarJwt(usuario.id, usuario.usuario, usuario.email);
+  const token = await generarJwt(usuario.id, usuario.usuario, usuario.email, usuario.avatar);
 
 
   return res.status(201).json({
@@ -69,9 +71,10 @@ export const revalidarToken = async (req:any, res:Response) => {
 
     const user = bdUser?.usuario;
     const ema = bdUser?.email;
+    const avatar = bdUser?.avatar
 
      //Generando Token/* 
-     const token = await generarJwt(uid, user, ema);
+     const token = await generarJwt(uid, user, ema, avatar);
 
 
     res.status(201).json({
@@ -80,6 +83,7 @@ export const revalidarToken = async (req:any, res:Response) => {
         uid: uid,
         name:user,
         email:ema,
+        avatar:avatar,
         token
     })
 
@@ -144,7 +148,7 @@ export const crearUsuario = async (req: Request, res: Response) => {
     
     console.log(usuario.id)
      //Generando Token/* 
-    const token = await generarJwt(usuario.id, usuario.usuario, usuario.email);
+    const token = await generarJwt(usuario.id, usuario.usuario, usuario.email, usuario.avatar);
     console.log(token)
 
     res.status(201).json({
@@ -166,6 +170,59 @@ export const crearUsuario = async (req: Request, res: Response) => {
         
     }
     
+    
+
+}
+
+export const crearUsuarioCloudinary = async (req: Request, res: Response) => {
+
+    console.log(req.body);
+    const file = req.files?.file
+
+    const validarExtension = validarExtensionCorte(file)
+    if (!validarExtension) {
+        res.status(404).json({
+            ok:false,
+            msg:'La extension del archivo no es válida'
+        })
+    } else {
+    try {    
+    const { body } = req;
+    const salt = bcrypt.genSaltSync(10);
+    req.body.password = bcrypt.hashSync(req.body.password, salt)
+    
+    //Cloudinary comprobar path y nombre
+    const tempFilePath:any = req.files?.file;
+    console.log(tempFilePath.tempFilePath)
+    const {secure_url} = await cloudinary.uploader.upload(tempFilePath.tempFilePath)
+    body.avatar = secure_url
+
+    const usuario = await Usuario.create(body)
+    
+    console.log(usuario.id)
+     //Generando Token/* 
+    const token = await generarJwt(usuario.id, usuario.usuario, usuario.email, usuario.avatar);
+    console.log(token)
+
+    res.status(201).json({
+        ok:true,
+        msg:"Usuario creado con éxito",
+        uid: usuario.id,
+        email:usuario.email,
+        token
+    })
+              
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            msg: `Hable con el Administrador`,
+            ok:false,
+            error
+        })
+        
+    }
+}
     
 
 }

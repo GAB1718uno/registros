@@ -84,7 +84,7 @@ const crearFallecidoCloudinary = (req, res) => __awaiter(void 0, void 0, void 0,
     if (!validando) {
         console.log('llego hasta aqui');
         res.status(404).json({
-            ok: true,
+            ok: false,
             msg: 'La extension no es válida'
         });
     }
