@@ -35,7 +35,6 @@ const Sepultura = db.define<ISepultura>('Sepultura', {
     
 
 );
-
 Sepultura.hasMany(Fallecido, {
     foreignKey:'sepulturaId',
     sourceKey:'id'

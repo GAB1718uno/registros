@@ -1,3 +1,4 @@
+"use strict";
 //import { DataTypes, Model, Sequelize } from 'sequelize';
 /* import db from '../db/connection';
 
@@ -31,58 +32,33 @@ Usuario.init({
 });
 
 export default Usuario; */
-
-export interface IUser extends Model {
-  id?: string,
-  rol?:string,
-  estado?:number,
-  usuario?: string,
-  password?: string,
-  email?: string,
-  avatar?:string,
-  createdAt?:string,
-  updateAt?: string
-}
-
-
-import { DataTypes, Model } from 'sequelize';
-import db from '../db/connection';
-import Perfil from './perfil';
-
-const Usuario = db.define<IUser>('Usuario', {
-  
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const sequelize_1 = require("sequelize");
+const connection_1 = __importDefault(require("../db/connection"));
+const Usuario = connection_1.default.define('Usuario', {
     usuario: {
-        type: DataTypes.STRING
+        type: sequelize_1.DataTypes.STRING
     },
     email: {
-      type: DataTypes.STRING
+        type: sequelize_1.DataTypes.STRING
     },
     password: {
-        type: DataTypes.STRING
+        type: sequelize_1.DataTypes.STRING
     },
     rol: {
-      type:DataTypes.STRING
+        type: sequelize_1.DataTypes.STRING
     },
     estado: {
-      type:DataTypes.STRING
+        type: sequelize_1.DataTypes.STRING
     },
     avatar: {
-      type:DataTypes.STRING
+        type: sequelize_1.DataTypes.STRING
     }
-  },
-    {
-      tableName:'usuarios',
-    }
-  );
-
-  Usuario.hasOne(Perfil, {
-    foreignKey: 'usuarioId',
-    sourceKey:'id'
-  })
-
-  Perfil.belongsTo(Usuario, {
-    foreignKey:'usuarioId',
-    targetKey:'id'
-  })
-  
-export default Usuario
+}, {
+    tableName: 'usuarios',
+});
+exports.default = Usuario;
+//# sourceMappingURL=usuario%20copy.js.map
