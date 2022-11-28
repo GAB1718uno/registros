@@ -38,7 +38,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const connection_1 = __importDefault(require("../db/connection"));
-const perfil_1 = __importDefault(require("./perfil"));
+const perfiles_1 = __importDefault(require("./perfiles"));
 const Usuario = connection_1.default.define('Usuario', {
     usuario: {
         type: sequelize_1.DataTypes.STRING
@@ -61,11 +61,11 @@ const Usuario = connection_1.default.define('Usuario', {
 }, {
     tableName: 'usuarios',
 });
-Usuario.hasOne(perfil_1.default, {
+Usuario.hasOne(perfiles_1.default, {
     foreignKey: 'usuarioId',
     sourceKey: 'id'
 });
-perfil_1.default.belongsTo(Usuario, {
+perfiles_1.default.belongsTo(Usuario, {
     foreignKey: 'usuarioId',
     targetKey: 'id'
 });

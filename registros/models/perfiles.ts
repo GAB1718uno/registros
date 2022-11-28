@@ -4,6 +4,7 @@ export interface IPerfil extends Model {
   estado?:number,
   avatar?:string,
   nombre?:string,
+  nombreUsuario?:string,
   apellidos?: string,
   identidad?: string,
   nacimiento?: Date,
@@ -28,6 +29,9 @@ const Perfil = db.define<IPerfil>('Perfil', {
     avatar: {
       type:DataTypes.STRING
     },
+    nombreUsuario:{
+      type:DataTypes.STRING
+    },
     nombre:{
       type:DataTypes.STRING
     },
@@ -40,7 +44,7 @@ const Perfil = db.define<IPerfil>('Perfil', {
   nacimiento: {
     type:DataTypes.DATE
   },
-  dirección: {
+  direccion: {
     type:DataTypes.STRING
   },
   genero: {
@@ -49,7 +53,7 @@ const Perfil = db.define<IPerfil>('Perfil', {
 
   },
     {
-      tableName:'usuarios',
+      tableName:'perfiles',
     }
   );
 

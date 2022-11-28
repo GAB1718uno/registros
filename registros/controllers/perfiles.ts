@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt'
 import generarJwt from '../helpers/jwt';
 import { v2 as cloudinary } from 'cloudinary'
 import { validarExtensionCorte } from '../helpers/validarExtensionCorte';
-import Perfil from '../models/perfil';
+import Perfil from '../models/perfiles';
 
 export const comprobarLogin = async (req:Request, res:Response) => {
 
@@ -93,11 +93,11 @@ export const revalidarToken = async (req:any, res:Response) => {
 
 
 
-export const obtenerUsuarios = async (req: Request, res: Response) => {
+export const obtenerPerfiles = async (req: Request, res: Response) => {
 
-const usuarios = await Usuario.findAll();
+const perfiles = await Perfil.findAll();
 
-    res.json(usuarios)
+    res.json(perfiles)
 
 }
 
@@ -174,6 +174,62 @@ export const crearPerfil = async (req: Request, res: Response) => {
 
 }
 
+export const actualizarPerfilCloudinary = async (req: Request, res: Response) => {
+
+    console.log(req.body);
+    const file = req.files?.file
+
+    const validarExtension = validarExtensionCorte(file)
+    if (!validarExtension) {
+        res.status(404).json({
+            ok:false,
+            msg:'La extension del archivo no es válida'
+        })
+    } else {
+    try {    
+    const { body } = req;
+    const { id } = req.params;
+    
+    //Cloudinary comprobar path y nombre
+    const tempFilePath:any = req.files?.file;
+    console.log(tempFilePath.tempFilePath)
+    const {secure_url} = await cloudinary.uploader.upload(tempFilePath.tempFilePath)
+    body.avatar = secure_url
+
+    const perfilUsuario = await Perfil.findByPk( id );
+        if(!perfilUsuario){
+            return res.status(404).json({
+                ok: false,
+                msg: 'No existe perfil del usuario'
+            })
+        }
+
+        await perfilUsuario.update( body );
+    
+
+    res.status(201).json({
+        ok:true,
+        msg:"Perfil actualizado con éxito",
+        uid: perfilUsuario.id,
+        usuario:perfilUsuario.nombreUsuario,
+        nombre:perfilUsuario.nombre
+    })
+              
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            msg: `Hable con el Administrador`,
+            ok:false,
+            error
+        })
+        
+    }
+}
+    
+
+}
+
 export const crearPerfilCloudinary = async (req: Request, res: Response) => {
 
     console.log(req.body);
@@ -227,23 +283,25 @@ export const crearPerfilCloudinary = async (req: Request, res: Response) => {
 
 }
 
-export const actualizarUsuario = async (req: Request, res: Response) => {
+export const actualizarPerfilUsuario = async (req: Request, res: Response) => {
 
     const { body } = req;
+    console.log(body);
+    
     const { id } = req.params;
 
     try {
 
-        const usuario = await Usuario.findByPk( id );
-        if(!usuario){
+        const perfilUsuario = await Perfil.findByPk( id );
+        if(!perfilUsuario){
             return res.status(404).json({
                 ok: false,
-                msg: 'No existe usuario con el ID'
+                msg: 'No existe perfil del usuario'
             })
         }
 
-        await usuario.update( body );
-        res.json(usuario)
+        await perfilUsuario.update( body );
+        res.json(perfilUsuario)
     
 
     } catch (error) {

@@ -35,12 +35,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUsuario = exports.actualizarPassword = exports.actualizarUsuario = exports.crearUsuarioCloudinary = exports.crearUsuario = exports.obtenerUsuario = exports.obtenerUsuarios = exports.revalidarToken = exports.comprobarLogin = void 0;
+exports.deleteUsuario = exports.actualizarPerfilUsuario = exports.crearPerfilCloudinary = exports.actualizarPerfilCloudinary = exports.crearPerfil = exports.obtenerUsuario = exports.obtenerPerfiles = exports.revalidarToken = exports.comprobarLogin = void 0;
 const usuario_1 = __importDefault(require("../models/usuario"));
 const bcrypt = __importStar(require("bcrypt"));
 const jwt_1 = __importDefault(require("../helpers/jwt"));
 const cloudinary_1 = require("cloudinary");
 const validarExtensionCorte_1 = require("../helpers/validarExtensionCorte");
+const perfiles_1 = __importDefault(require("../models/perfiles"));
 const comprobarLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     console.log(email, password);
@@ -102,11 +103,11 @@ const revalidarToken = (req, res) => __awaiter(void 0, void 0, void 0, function*
     });
 });
 exports.revalidarToken = revalidarToken;
-const obtenerUsuarios = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const usuarios = yield usuario_1.default.findAll();
-    res.json(usuarios);
+const obtenerPerfiles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const perfiles = yield perfiles_1.default.findAll();
+    res.json(perfiles);
 });
-exports.obtenerUsuarios = obtenerUsuarios;
+exports.obtenerPerfiles = obtenerPerfiles;
 const obtenerUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const usuario = yield usuario_1.default.findByPk(id);
@@ -131,29 +132,25 @@ const obtenerUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.obtenerUsuario = obtenerUsuario;
-const crearUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const crearPerfil = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(req.body);
     try {
         const { body } = req;
-        const salt = bcrypt.genSaltSync(10);
-        req.body.password = bcrypt.hashSync(req.body.password, salt);
-        const usuario = yield usuario_1.default.create(body);
+        //const salt = bcrypt.genSaltSync(10);
+        //req.body.password = bcrypt.hashSync(req.body.password, salt)
+        const perfil = yield perfiles_1.default.create(body);
         /* const usuario = Usuario.build( req.body )
-    
-    
         
         await usuario.save(); */
-        console.log(usuario.id);
+        console.log(perfil.id);
         //Generando Token/* 
-        const token = yield (0, jwt_1.default)(usuario.id, usuario.usuario, usuario.email, usuario.avatar);
-        console.log(token);
+        //const token = await generarJwt(usuario.id, usuario.usuario, usuario.email, usuario.avatar);
+        //console.log(token)
         res.status(201).json({
             ok: true,
-            msg: "Usuario creado con éxito",
-            uid: usuario.id,
-            email: usuario.email,
-            nombreUsuario: usuario.usuario,
-            token
+            msg: "Perfil creado con éxito",
+            uid: perfil.id,
+            email: perfil.identidad
         });
     }
     catch (error) {
@@ -165,8 +162,8 @@ const crearUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
 });
-exports.crearUsuario = crearUsuario;
-const crearUsuarioCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.crearPerfil = crearPerfil;
+const actualizarPerfilCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     console.log(req.body);
     const file = (_a = req.files) === null || _a === void 0 ? void 0 : _a.file;
@@ -180,10 +177,57 @@ const crearUsuarioCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, f
     else {
         try {
             const { body } = req;
+            const { id } = req.params;
+            //Cloudinary comprobar path y nombre
+            const tempFilePath = (_b = req.files) === null || _b === void 0 ? void 0 : _b.file;
+            console.log(tempFilePath.tempFilePath);
+            const { secure_url } = yield cloudinary_1.v2.uploader.upload(tempFilePath.tempFilePath);
+            body.avatar = secure_url;
+            const perfilUsuario = yield perfiles_1.default.findByPk(id);
+            if (!perfilUsuario) {
+                return res.status(404).json({
+                    ok: false,
+                    msg: 'No existe perfil del usuario'
+                });
+            }
+            yield perfilUsuario.update(body);
+            res.status(201).json({
+                ok: true,
+                msg: "Perfil actualizado con éxito",
+                uid: perfilUsuario.id,
+                usuario: perfilUsuario.nombreUsuario,
+                nombre: perfilUsuario.nombre
+            });
+        }
+        catch (error) {
+            console.log(error);
+            res.status(500).json({
+                msg: `Hable con el Administrador`,
+                ok: false,
+                error
+            });
+        }
+    }
+});
+exports.actualizarPerfilCloudinary = actualizarPerfilCloudinary;
+const crearPerfilCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c, _d;
+    console.log(req.body);
+    const file = (_c = req.files) === null || _c === void 0 ? void 0 : _c.file;
+    const validarExtension = (0, validarExtensionCorte_1.validarExtensionCorte)(file);
+    if (!validarExtension) {
+        res.status(404).json({
+            ok: false,
+            msg: 'La extension del archivo no es válida'
+        });
+    }
+    else {
+        try {
+            const { body } = req;
             const salt = bcrypt.genSaltSync(10);
             req.body.password = bcrypt.hashSync(req.body.password, salt);
             //Cloudinary comprobar path y nombre
-            const tempFilePath = (_b = req.files) === null || _b === void 0 ? void 0 : _b.file;
+            const tempFilePath = (_d = req.files) === null || _d === void 0 ? void 0 : _d.file;
             console.log(tempFilePath.tempFilePath);
             const { secure_url } = yield cloudinary_1.v2.uploader.upload(tempFilePath.tempFilePath);
             body.avatar = secure_url;
@@ -210,20 +254,21 @@ const crearUsuarioCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, f
         }
     }
 });
-exports.crearUsuarioCloudinary = crearUsuarioCloudinary;
-const actualizarUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.crearPerfilCloudinary = crearPerfilCloudinary;
+const actualizarPerfilUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
+    console.log(body);
     const { id } = req.params;
     try {
-        const usuario = yield usuario_1.default.findByPk(id);
-        if (!usuario) {
+        const perfilUsuario = yield perfiles_1.default.findByPk(id);
+        if (!perfilUsuario) {
             return res.status(404).json({
                 ok: false,
-                msg: 'No existe usuario con el ID'
+                msg: 'No existe perfil del usuario'
             });
         }
-        yield usuario.update(body);
-        res.json(usuario);
+        yield perfilUsuario.update(body);
+        res.json(perfilUsuario);
     }
     catch (error) {
         console.log(error);
@@ -232,30 +277,7 @@ const actualizarUsuario = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
 });
-exports.actualizarUsuario = actualizarUsuario;
-const actualizarPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { body } = req;
-    try {
-        const salt = bcrypt.genSaltSync(10);
-        body.password = bcrypt.hashSync(body.password, salt);
-        const usuario = yield usuario_1.default.findByPk(body.id);
-        if (!usuario) {
-            return res.status(404).json({
-                ok: false,
-                msg: 'Algo va mal. Compruebe!!!'
-            });
-        }
-        yield usuario.update(body);
-        res.json(usuario);
-    }
-    catch (error) {
-        console.log(error);
-        res.status(500).json({
-            msg: `Hable con el Administrador`
-        });
-    }
-});
-exports.actualizarPassword = actualizarPassword;
+exports.actualizarPerfilUsuario = actualizarPerfilUsuario;
 const deleteUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
@@ -278,4 +300,4 @@ const deleteUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.deleteUsuario = deleteUsuario;
-//# sourceMappingURL=usuarios.js.map
+//# sourceMappingURL=perfiles.js.map

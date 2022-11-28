@@ -47,7 +47,7 @@ export interface IUser extends Model {
 
 import { DataTypes, Model } from 'sequelize';
 import db from '../db/connection';
-import Perfil from './perfil';
+import Perfil from './perfiles';
 
 const Usuario = db.define<IUser>('Usuario', {
   

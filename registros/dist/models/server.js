@@ -20,7 +20,7 @@ const uploads_1 = __importDefault(require("../routes/uploads"));
 const sepulturas_1 = __importDefault(require("../routes/sepulturas"));
 const likes_1 = __importDefault(require("../routes/likes"));
 const futuros_1 = __importDefault(require("../routes/futuros"));
-const perfil_1 = __importDefault(require("../routes/perfil"));
+const perfiles_1 = __importDefault(require("../routes/perfiles"));
 const comentarios_1 = __importDefault(require("../routes/comentarios"));
 const connection_1 = __importDefault(require("../db/connection"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
@@ -49,7 +49,7 @@ class Server {
             futuros: '/api/futuros'
         };
         this.pathPerfil = {
-            perfil: '/api/perfil'
+            perfil: '/api/perfiles'
         };
         this.app = (0, express_1.default)();
         this.secret = process.env.SECRET_JWT_SEED || '';
@@ -81,7 +81,7 @@ class Server {
         this.app.use(this.pathLikes.likes, likes_1.default);
         this.app.use(this.pathComentarios.comentarios, comentarios_1.default);
         this.app.use(this.pathFuturos.futuros, futuros_1.default);
-        this.app.use(this.pathPerfil.perfil, perfil_1.default);
+        this.app.use(this.pathPerfil.perfil, perfiles_1.default);
     }
     listen() {
         this.app.listen(this.port, () => {

@@ -25,6 +25,7 @@ router.post('/nuevo', [
     validarEmail_1.validarEmail,
 ], usuarios_1.crearUsuario); //crearUsuarioCloudinary
 router.get('/:id', usuarios_1.obtenerUsuario);
+router.put('/password', [], usuarios_1.actualizarPassword);
 router.put('/:id', [
     (0, express_validator_1.check)('usuario', 'El nombre del usuario es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('email', 'El email es obligatorio').isEmail().not().isEmpty(),

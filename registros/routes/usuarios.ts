@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { check } from "express-validator";
-import { deleteUsuario, comprobarLogin, revalidarToken, crearUsuario, obtenerUsuarios, obtenerUsuario, actualizarUsuario, crearUsuarioCloudinary } from '../controllers/usuarios';
+import { deleteUsuario, comprobarLogin, revalidarToken, crearUsuario, obtenerUsuarios, obtenerUsuario, actualizarUsuario, crearUsuarioCloudinary, actualizarPassword } from '../controllers/usuarios';
 import { validarCampos } from '../middlewares/validarCampos';
 import { validarEmail } from '../middlewares/validarEmail';
 import { validarJwt } from "../middlewares/validarJWT";
@@ -33,6 +33,8 @@ router.post('/nuevo',
 
 
 router.get('/:id', obtenerUsuario);
+
+router.put('/password', [], actualizarPassword)
 
 router.put('/:id',
 [

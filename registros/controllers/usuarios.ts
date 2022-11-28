@@ -23,7 +23,7 @@ export const comprobarLogin = async (req:Request, res:Response) => {
             msg: 'Email no encontrado'
         })
     }
-
+    
     const validPassword = await bcrypt.compare( password, usuario.password! )
     /* console.log(password)
     console.log(usuario.password)
@@ -143,6 +143,8 @@ export const crearUsuario = async (req: Request, res: Response) => {
     
     const usuario = await Usuario.create(body)
     /* const usuario = Usuario.build( req.body )
+
+
     
     await usuario.save(); */
     
@@ -156,8 +158,10 @@ export const crearUsuario = async (req: Request, res: Response) => {
         msg:"Usuario creado con éxito",
         uid: usuario.id,
         email:usuario.email,
+        nombreUsuario: usuario.usuario,
         token
     })
+    
               
 
     } catch (error) {
@@ -239,6 +243,35 @@ export const actualizarUsuario = async (req: Request, res: Response) => {
             return res.status(404).json({
                 ok: false,
                 msg: 'No existe usuario con el ID'
+            })
+        }
+
+        await usuario.update( body );
+        res.json(usuario)
+    
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            msg: `Hable con el Administrador`
+        })
+        
+    }
+
+}
+
+export const actualizarPassword = async (req: Request, res: Response) => {
+
+    const { body } = req;
+
+    try {
+    const salt = bcrypt.genSaltSync(10);
+    body.password = bcrypt.hashSync(body.password, salt)
+        const usuario = await Usuario.findByPk( body.id );
+        if(!usuario){
+            return res.status(404).json({
+                ok: false,
+                msg: 'Algo va mal. Compruebe!!!'
             })
         }
 
