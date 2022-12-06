@@ -6,93 +6,6 @@ import { v2 as cloudinary } from 'cloudinary'
 import { validarExtensionCorte } from '../helpers/validarExtensionCorte';
 import Perfil from '../models/perfiles';
 
-export const comprobarLogin = async (req:Request, res:Response) => {
-
-   const { email, password  }= req.body
-
-   console.log(email,password)
-
-    
-   const usuario = await Usuario.findOne( {where: {email:email}} );
-
-    //console.log(usuario.email)
- 
-    try {
-    if (!usuario){
-        return res.status(400).json({
-            ok: false,
-            msg: 'Email no encontrado'
-        })
-    }
-
-    const validPassword = await bcrypt.compare( password, usuario.password! )
-    /* console.log(password)
-    console.log(usuario.password)
-    console.log(validPassword) */
-    if (!validPassword){
-        return res.status(400).json({
-            ok: false,
-            msg: 'Password no encontrado'
-        })
-    }
-
-      //Generando Token/* 
-  const token = await generarJwt(usuario.id, usuario.usuario, usuario.email, usuario.avatar);
-
-
-  return res.status(201).json({
-      ok:true,
-      msg:"Logueado con éxito",
-      uid: usuario.id,
-      name: usuario.usuario,
-      email:email,
-      token
-  })
-
-} catch (error) {
-    console.log(error)
-    res.status(500).json({
-        msg: `Hable con el Administrador`
-    })
-    
-}
-
-}
-
-
-export const revalidarToken = async (req:any, res:Response) => {
-
-    const { uid } = req
-
-    //leer de la base de datos
-
-
-    
-    const bdUser = await Usuario.findByPk(uid)
-
-    const user = bdUser?.usuario;
-    const ema = bdUser?.email;
-    const avatar = bdUser?.avatar
-
-     //Generando Token/* 
-     const token = await generarJwt(uid, user, ema, avatar);
-
-
-    res.status(201).json({
-        ok:true,
-        msg:'Token renovado',
-        uid: uid,
-        name:user,
-        email:ema,
-        avatar:avatar,
-        token
-    })
-
-    
-}
-
-
-
 export const obtenerPerfiles = async (req: Request, res: Response) => {
 
 const perfiles = await Perfil.findAll();
@@ -101,17 +14,17 @@ const perfiles = await Perfil.findAll();
 
 }
 
-export const obtenerUsuario = async (req: Request, res: Response) => {
+export const obtenerPerfilPorId = async (req: Request, res: Response) => {
 
     const { id } = req.params;
 
-    const usuario = await Usuario.findByPk( id );
+    const perfil = await Perfil.findByPk( id );
 
      try {
-    if(usuario) {
+    if(perfil) {
        
 
-            res.json(usuario)
+            res.json(perfil)
             /* res.status(200).json({ 
                 ok:true,
                 usuario
@@ -121,7 +34,7 @@ export const obtenerUsuario = async (req: Request, res: Response) => {
         
     } else {
         res.status(404).json({
-            msg: `No existe un usuario con este ID`
+            msg: `No existe perfil para el usuario con este ID`
         })
     }
 } catch (error) {
@@ -134,7 +47,7 @@ export const obtenerUsuario = async (req: Request, res: Response) => {
 }
 
 export const crearPerfil = async (req: Request, res: Response) => {
-
+    
     console.log(req.body);
     
     try {    
@@ -212,7 +125,9 @@ export const actualizarPerfilCloudinary = async (req: Request, res: Response) =>
         msg:"Perfil actualizado con éxito",
         uid: perfilUsuario.id,
         usuario:perfilUsuario.nombreUsuario,
-        nombre:perfilUsuario.nombre
+        nombre:perfilUsuario.nombre,
+        avatar: perfilUsuario.avatar
+
     })
               
 
@@ -231,9 +146,14 @@ export const actualizarPerfilCloudinary = async (req: Request, res: Response) =>
 }
 
 export const crearPerfilCloudinary = async (req: Request, res: Response) => {
-
+    
+    const { body } = req;
     console.log(req.body);
     const file = req.files?.file
+    
+    if (!file) {
+        body.avatar = 'https://res.cloudinary.com/ddxm1pvmd/image/upload/v1669648194/nlnoip90imlo1gu7aezm.png';
+    } else {
 
     const validarExtension = validarExtensionCorte(file)
     if (!validarExtension) {
@@ -242,30 +162,22 @@ export const crearPerfilCloudinary = async (req: Request, res: Response) => {
             msg:'La extension del archivo no es válida'
         })
     } else {
-    try {    
-    const { body } = req;
-    const salt = bcrypt.genSaltSync(10);
-    req.body.password = bcrypt.hashSync(req.body.password, salt)
-    
-    //Cloudinary comprobar path y nombre
+        //Cloudinary comprobar path y nombre
     const tempFilePath:any = req.files?.file;
     console.log(tempFilePath.tempFilePath)
     const {secure_url} = await cloudinary.uploader.upload(tempFilePath.tempFilePath)
     body.avatar = secure_url
+    } 
 
-    const usuario = await Usuario.create(body)
+    try {  
+    const perfil = await Perfil.create(body)
     
-    console.log(usuario.id)
+    console.log(perfil.id)
      //Generando Token/* 
-    const token = await generarJwt(usuario.id, usuario.usuario, usuario.email, usuario.avatar);
-    console.log(token)
-
     res.status(201).json({
         ok:true,
-        msg:"Usuario creado con éxito",
-        uid: usuario.id,
-        email:usuario.email,
-        token
+        msg:"Perfil creado con éxito",
+        perfil
     })
               
 

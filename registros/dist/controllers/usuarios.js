@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUsuario = exports.actualizarPassword = exports.actualizarUsuario = exports.crearUsuarioCloudinary = exports.crearUsuario = exports.obtenerUsuario = exports.obtenerUsuarios = exports.revalidarToken = exports.comprobarLogin = void 0;
+exports.deleteUsuario = exports.actualizarPassword = exports.actualizarAvatar = exports.actualizarUsuario = exports.crearUsuarioCloudinary = exports.crearUsuario = exports.obtenerUsuario = exports.obtenerUsuarios = exports.revalidarToken = exports.comprobarLogin = void 0;
 const usuario_1 = __importDefault(require("../models/usuario"));
 const bcrypt = __importStar(require("bcrypt"));
 const jwt_1 = __importDefault(require("../helpers/jwt"));
@@ -70,7 +70,8 @@ const comprobarLogin = (req, res) => __awaiter(void 0, void 0, void 0, function*
             msg: "Logueado con éxito",
             uid: usuario.id,
             name: usuario.usuario,
-            email: email,
+            email: usuario.email,
+            avatar: usuario.avatar,
             token
         });
     }
@@ -233,6 +234,28 @@ const actualizarUsuario = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.actualizarUsuario = actualizarUsuario;
+const actualizarAvatar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { body } = req;
+    try {
+        const usuario = yield usuario_1.default.findByPk(body.id);
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Algo va mal. Compruebe!!!'
+            });
+        }
+        console.log(body);
+        yield usuario.update(body);
+        res.json(usuario);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: `Hable con el Administrador`
+        });
+    }
+});
+exports.actualizarAvatar = actualizarAvatar;
 const actualizarPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
     try {

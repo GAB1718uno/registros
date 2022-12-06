@@ -21,8 +21,8 @@ check('email', 'El email es obligatorio').isEmail().not().isEmpty(),
 check('password', 'El password debe contener mayusculas, minusculas, numeros y al menos un caracter especial').isStrongPassword(),
 validarCampos,
 validarEmail, */
-], perfiles_1.crearPerfil);
-router.get('/:id', usuarios_1.obtenerUsuario);
+], perfiles_1.crearPerfilCloudinary);
+router.get('/:id', perfiles_1.obtenerPerfilPorId);
 router.put('/:id', [
 /* check('usuario', 'El nombre del usuario es obligatorio').not().isEmpty(),
 check('email', 'El email es obligatorio').isEmail().not().isEmpty(),

@@ -44,7 +44,8 @@ export const comprobarLogin = async (req:Request, res:Response) => {
       msg:"Logueado con éxito",
       uid: usuario.id,
       name: usuario.usuario,
-      email:email,
+      email:usuario.email,
+      avatar:usuario.avatar,
       token
   })
 
@@ -260,6 +261,33 @@ export const actualizarUsuario = async (req: Request, res: Response) => {
 
 }
 
+export const actualizarAvatar = async (req: Request, res: Response) => {
+    const { body } = req;
+
+    try {
+        const usuario = await Usuario.findByPk( body.id );
+        if(!usuario){
+            return res.status(404).json({
+                ok: false,
+                msg: 'Algo va mal. Compruebe!!!'
+            })
+        }
+
+        console.log(body);
+        
+        await usuario.update( body );
+        res.json(usuario)
+    
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            msg: `Hable con el Administrador`
+        })
+
+}
+}
+
 export const actualizarPassword = async (req: Request, res: Response) => {
 
     const { body } = req;
@@ -319,4 +347,3 @@ try {
 });
 }
 }
-

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { check } from "express-validator";
-import { actualizarPerfilCloudinary, actualizarPerfilUsuario, crearPerfil, obtenerPerfiles } from "../controllers/perfiles";
+import { actualizarPerfilCloudinary, crearPerfilCloudinary, obtenerPerfiles, obtenerPerfilPorId } from '../controllers/perfiles';
 import { deleteUsuario, comprobarLogin, revalidarToken, crearUsuario, obtenerUsuarios, obtenerUsuario, actualizarUsuario, crearUsuarioCloudinary } from '../controllers/usuarios';
 import { validarCampos } from '../middlewares/validarCampos';
 import { validarEmail } from '../middlewares/validarEmail';
@@ -28,12 +28,12 @@ router.post('/nuevo',
     check('password', 'El password debe contener mayusculas, minusculas, numeros y al menos un caracter especial').isStrongPassword(),
     validarCampos,
     validarEmail, */
-] , crearPerfil);
+] , crearPerfilCloudinary);
 
 
 
 
-router.get('/:id', obtenerUsuario);
+router.get('/:id', obtenerPerfilPorId);
 
 router.put('/:id',
 [
