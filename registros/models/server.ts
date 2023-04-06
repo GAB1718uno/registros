@@ -7,6 +7,7 @@ import sepulturaRoutes from "../routes/sepulturas"
 import likesRoutes from "../routes/likes"
 import futurosRoutes from "../routes/futuros"
 import perfilesRoutes from "../routes/perfiles"
+import historiasRoutes from "../routes/historias"
 import comentariosRoutes from "../routes/comentarios"
 import db from '../db/connection';
 import fileUpload from 'express-fileupload';
@@ -48,6 +49,10 @@ class Server {
     
     private pathPerfil ={
         perfil: '/api/perfiles'
+    }
+
+    private pathHistoria ={
+        historias: '/api/historias'
     }
 
 
@@ -93,6 +98,7 @@ class Server {
         this.app.use(this.pathComentarios.comentarios, comentariosRoutes)
         this.app.use(this.pathFuturos.futuros, futurosRoutes )
         this.app.use(this.pathPerfil.perfil, perfilesRoutes )
+        this.app.use(this.pathHistoria.historias, historiasRoutes)
     }
 
     
