@@ -28,43 +28,29 @@ return res.json(muerto)
       }
   }
  
- export const getFallecidosCriba = async (req: Request, res: Response) => {
+ export const getHistoriaPorFallecido = async (req: Request, res: Response) => {
     
-    const tipo = req.params.tipo;
-    const busqueda = req.params.termino;
+    const fallecidoId = req.params.fallecidoId;
+    console.log('Este es el valor del fallecidoId: '+ fallecidoId)
 
-switch (tipo) {
-    case 'apellido':
-        const fallecidos = await Fallecido.findAll(
+        try {
+            const historias = await Historia.findAll(
             {   limit:10,
-                where: { apellidos: {
-                    [Op.like]: '%'+ busqueda + '%'
-                } 
-            }}
+                where: { fallecidoId: fallecidoId } 
+            }
             )
-
             
 
-            res.json(fallecidos)
+            res.json(historias)
+            }
+            catch (error) {
+                console.log(error)
+                res.status(500).json({
+                    msg: `Hable con el Administrador`
+                })
         
-        break;
-        case 'sepultura':
-            const fallecidosSep = await Fallecido.findAll(
-                {   limit:10,
-                    where: { sepult: {
-                        [Op.like]: '%'+ busqueda + '%'
-                    } 
-                }}
-                )
-                res.json(fallecidosSep)
-        
-            break;
-
-    default:
-        res.status(400).json({
-            msg: `Hable con el Administrador`
-        })
-} 
+            }
+ 
 }
 
 export const getFallecidos = async (req: Request, res: Response) => {
@@ -106,7 +92,7 @@ export const crearHistoriaCloudinary = async (req: Request, res: Response) => {
             const tempFilePath:any = req.files?.file;
             console.log(tempFilePath.tempFilePath)
             const {secure_url} = await cloudinary.uploader.upload(tempFilePath.tempFilePath)
-            body.url = secure_url
+            body.img = secure_url
             
             const historia = Historia.build(body)
         await historia.save();

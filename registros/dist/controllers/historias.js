@@ -12,8 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteFallecido = exports.putFallecido = exports.actualizarFallecidoCloudinary = exports.postFallecidos = exports.crearHistoriaCloudinary = exports.getFallecido = exports.getFallecidos = exports.getFallecidosCriba = exports.obtenerRelacionado = void 0;
-const sequelize_1 = require("sequelize");
+exports.deleteFallecido = exports.putFallecido = exports.actualizarFallecidoCloudinary = exports.postFallecidos = exports.crearHistoriaCloudinary = exports.getFallecido = exports.getFallecidos = exports.getHistoriaPorFallecido = exports.obtenerRelacionado = void 0;
 const validarExtensionCorte_1 = require("../helpers/validarExtensionCorte");
 const fallecido_1 = __importDefault(require("../models/fallecido"));
 const cloudinary_1 = require("cloudinary");
@@ -37,33 +36,23 @@ const obtenerRelacionado = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.obtenerRelacionado = obtenerRelacionado;
-const getFallecidosCriba = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const tipo = req.params.tipo;
-    const busqueda = req.params.termino;
-    switch (tipo) {
-        case 'apellido':
-            const fallecidos = yield fallecido_1.default.findAll({ limit: 10,
-                where: { apellidos: {
-                        [sequelize_1.Op.like]: '%' + busqueda + '%'
-                    }
-                } });
-            res.json(fallecidos);
-            break;
-        case 'sepultura':
-            const fallecidosSep = yield fallecido_1.default.findAll({ limit: 10,
-                where: { sepult: {
-                        [sequelize_1.Op.like]: '%' + busqueda + '%'
-                    }
-                } });
-            res.json(fallecidosSep);
-            break;
-        default:
-            res.status(400).json({
-                msg: `Hable con el Administrador`
-            });
+const getHistoriaPorFallecido = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const fallecidoId = req.params.fallecidoId;
+    console.log('Este es el valor del fallecidoId: ' + fallecidoId);
+    try {
+        const historias = yield historia_1.default.findAll({ limit: 10,
+            where: { fallecidoId: fallecidoId }
+        });
+        res.json(historias);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: `Hable con el Administrador`
+        });
     }
 });
-exports.getFallecidosCriba = getFallecidosCriba;
+exports.getHistoriaPorFallecido = getHistoriaPorFallecido;
 const getFallecidos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const fallecidos = yield fallecido_1.default.findAll();
     res.json(fallecidos);
@@ -95,7 +84,7 @@ const crearHistoriaCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, 
             const tempFilePath = (_b = req.files) === null || _b === void 0 ? void 0 : _b.file;
             console.log(tempFilePath.tempFilePath);
             const { secure_url } = yield cloudinary_1.v2.uploader.upload(tempFilePath.tempFilePath);
-            body.url = secure_url;
+            body.img = secure_url;
             const historia = historia_1.default.build(body);
             yield historia.save();
             console.log('Historia creada en base de datos y archivo en Cloudinary');
