@@ -20,8 +20,14 @@ const cloudinary_1 = require("cloudinary");
 const actualizar_imagen_cloudinary_1 = __importDefault(require("../helpers/actualizar-imagen-cloudinary"));
 const obtenerRelacionado = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { sepult } = req.params;
-    console.log(sepult);
-    const muerto = yield fallecido_1.default.findAll({ where: { sepult: sepult } });
+    const { sepulturaId } = req.params;
+    console.log("LA SEPULTURA ES LA DE LA CALLE: " + sepult);
+    const muerto = yield fallecido_1.default.findAll({
+        where: {
+            sepulturaId: sepulturaId
+            /* sepult:sepult */ 
+        }
+    });
     try {
         if (!sepult) {
             res.json(muerto);
@@ -64,10 +70,49 @@ const getFallecidosCriba = (req, res) => __awaiter(void 0, void 0, void 0, funct
 });
 exports.getFallecidosCriba = getFallecidosCriba;
 const getFallecidos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const fallecidos = yield fallecido_1.default.findAll();
+    console.log("El valor de pageSize es actualmente: " + req.params.pageSize);
+    let pageSize = parseInt(req.params.pageSize) || 20;
+    console.log("El valor de pageSize es ahora: " + pageSize);
+    let page = parseInt(req.params.page) || 1;
+    if (isNaN(pageSize) || pageSize <= 0) {
+        return res.status(400).json({ error: 'El parámetro "pageSize" debe ser un número entero mayor que cero' });
+    }
+    if (isNaN(page) || page <= 0) {
+        page = 1;
+    }
+    const offset = (page - 1) * pageSize;
+    console.log(page);
+    const fallecidos = yield fallecido_1.default.findAndCountAll({
+        order: [['fallecio', 'DESC']],
+        limit: pageSize,
+        offset,
+    });
     res.json(fallecidos);
 });
 exports.getFallecidos = getFallecidos;
+//Obtener fallecidos por limite
+/* export const getFallecidos = async (req: Request, res: Response) => {
+    const limit = parseInt(req.params.limit);
+    const offset = parseInt(req.params.offset);
+
+    
+    const fallecidos = await Fallecido.findAll({
+        order: [['fallecio', 'DESC']],
+        limit,
+        offset
+    });
+
+    res.json(fallecidos)
+
+} */
+// Obtener fallecidos de forma normal
+/* export const getFallecidos = async (req: Request, res: Response) => {
+
+    
+    const fallecidos = await Fallecido.findAll();
+    res.json(fallecidos)
+
+} */
 const getFallecido = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const fallecidos = yield fallecido_1.default.findByPk(id);

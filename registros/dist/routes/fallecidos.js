@@ -8,10 +8,13 @@ const validarJWT_1 = require("../middlewares/validarJWT");
 const tiposPermitidos_1 = require("../helpers/tiposPermitidos");
 const validarArchivoExiste_1 = require("../middlewares/validarArchivoExiste");
 const router = (0, express_1.Router)();
-router.get('/', fallecidos_1.getFallecidos);
 router.get('/busqueda/:tipo/:termino', fallecidos_1.getFallecidosCriba);
+//Con limit y paginanción
+router.get('/:id/:sepult/:sepulturaId', fallecidos_1.obtenerRelacionado);
+router.get('/:pageSize/:page', fallecidos_1.getFallecidos);
+//Original sin limit ni paginación
+router.get('/', fallecidos_1.getFallecidos);
 router.get('/:id', fallecidos_1.getFallecido);
-router.get('/:id/:sepult', fallecidos_1.obtenerRelacionado);
 /* router.put('/:id',
 [
     check('name', 'El nombre del fallecido es obligatorio').not().isEmpty(),

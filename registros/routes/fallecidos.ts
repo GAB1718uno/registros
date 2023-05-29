@@ -8,11 +8,16 @@ import { validarArchivoExiste } from "../middlewares/validarArchivoExiste";
 
 const router = Router();
 
-
-router.get('/', getFallecidos);
 router.get('/busqueda/:tipo/:termino', getFallecidosCriba);
+
+//Con limit y paginanción
+router.get('/:id/:sepult/:sepulturaId', obtenerRelacionado);
+router.get('/:pageSize/:page', getFallecidos);
+
+//Original sin limit ni paginación
+router.get('/', getFallecidos);
+
 router.get('/:id', getFallecido);
-router.get('/:id/:sepult', obtenerRelacionado);
 /* router.put('/:id',
 [
     check('name', 'El nombre del fallecido es obligatorio').not().isEmpty(),

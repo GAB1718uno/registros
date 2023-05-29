@@ -13,12 +13,17 @@ import db from '../db/connection';
 import fileUpload from 'express-fileupload';
 import bodyParser from 'body-parser';
 
+//const paginate = require("express-paginate");
+
 
 class Server {
 
     private app: Application;
     private port: string;
     private secret: string;
+    
+
+
     private usersPaths = {
         usuarios: '/api/usuarios'
     }
@@ -62,6 +67,7 @@ class Server {
         this.port = process.env.PORT || '3000'
 
         this.dbConnection();
+
         
         //Llamando middlewares
         this.middlewares();
@@ -129,6 +135,9 @@ class Server {
     
         //Carpeta publica
         this.app.use( express.static('public'));
+
+        //Uso del midleware para paginación
+        //this.app.use(paginate.middleware(1,5))
     }
 }
 

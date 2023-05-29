@@ -1,17 +1,26 @@
 import { Request, Response } from "express";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import { validarExtensionCorte } from "../helpers/validarExtensionCorte";
 import Fallecido from "../models/fallecido";
 import { v2 as cloudinary } from 'cloudinary'
 import actualizarImagenCloudinary from "../helpers/actualizar-imagen-cloudinary";
+import { Where } from "sequelize/types/utils";
 
 export const obtenerRelacionado = async (req:Request, res:Response) => {
 
      const {sepult} = req.params
+     const {sepulturaId} = req.params
  
-    console.log(sepult)
+    console.log("LA SEPULTURA ES LA DE LA CALLE: "+sepult)
  
-     const muerto = await Fallecido.findAll( {where: {sepult:sepult}} );
+     const muerto = await Fallecido.findAll(
+         {
+        
+        where: {
+            sepulturaId:sepulturaId
+            /* sepult:sepult */}} 
+            
+            ) ;
  
      try {
      if (!sepult){
@@ -66,13 +75,66 @@ switch (tipo) {
 } 
 }
 
+
 export const getFallecidos = async (req: Request, res: Response) => {
+
+    console.log("El valor de pageSize es actualmente: " + req.params.pageSize);
+    
+
+    let pageSize = parseInt(req.params.pageSize) || 20;
+
+    console.log("El valor de pageSize es ahora: " + pageSize);
+
+    let page = parseInt(req.params.page) || 1;
+  
+    if (isNaN(pageSize) || pageSize <= 0) {
+      return res.status(400).json({ error: 'El parámetro "pageSize" debe ser un número entero mayor que cero' });
+    }
+  
+    if (isNaN(page) || page <= 0) {
+      page = 1;
+    }
+  
+    const offset = (page - 1) * pageSize;
+    console.log(page);
+    
+  
+    const fallecidos = await Fallecido.findAndCountAll
+    ({
+        order: [['fallecio', 'DESC']],
+      limit: pageSize,
+      offset,
+    });
+  
+    res.json(fallecidos);
+  };
+
+  
+
+//Obtener fallecidos por limite
+/* export const getFallecidos = async (req: Request, res: Response) => {
+    const limit = parseInt(req.params.limit);
+    const offset = parseInt(req.params.offset);
+
+    
+    const fallecidos = await Fallecido.findAll({
+        order: [['fallecio', 'DESC']],
+        limit,
+        offset
+    });
+
+    res.json(fallecidos)
+
+} */
+
+// Obtener fallecidos de forma normal
+/* export const getFallecidos = async (req: Request, res: Response) => {
 
     
     const fallecidos = await Fallecido.findAll();
     res.json(fallecidos)
 
-}
+} */
 
 export const getFallecido = async (req: Request, res: Response) => {
 

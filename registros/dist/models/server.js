@@ -26,6 +26,7 @@ const comentarios_1 = __importDefault(require("../routes/comentarios"));
 const connection_1 = __importDefault(require("../db/connection"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const body_parser_1 = __importDefault(require("body-parser"));
+//const paginate = require("express-paginate");
 class Server {
     constructor() {
         this.usersPaths = {
@@ -107,6 +108,8 @@ class Server {
         }));
         //Carpeta publica
         this.app.use(express_1.default.static('public'));
+        //Uso del midleware para paginación
+        //this.app.use(paginate.middleware(1,5))
     }
 }
 exports.default = Server;
