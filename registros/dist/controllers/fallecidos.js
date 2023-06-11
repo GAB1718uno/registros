@@ -24,8 +24,8 @@ const obtenerRelacionado = (req, res) => __awaiter(void 0, void 0, void 0, funct
     console.log("LA SEPULTURA ES LA DE LA CALLE: " + sepult);
     const muerto = yield fallecido_1.default.findAll({
         where: {
-            sepulturaId: sepulturaId
-            /* sepult:sepult */ 
+            //sepulturaId:sepulturaId
+            sepult: sepult
         }
     });
     try {

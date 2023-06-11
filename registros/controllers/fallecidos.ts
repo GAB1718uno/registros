@@ -17,8 +17,8 @@ export const obtenerRelacionado = async (req:Request, res:Response) => {
          {
         
         where: {
-            sepulturaId:sepulturaId
-            /* sepult:sepult */}} 
+            //sepulturaId:sepulturaId
+            sepult:sepult}} 
             
             ) ;
  
