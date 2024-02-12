@@ -22,15 +22,24 @@ const cloudinary_1 = require("cloudinary");
 const sequelize_1 = require("sequelize");
 const obtenerSepulturaCribada = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const busqueda = req.params.termino;
-    const sepulturas = yield sepultura_1.default.findAll({ limit: 10,
-        where: { calle: {
-                [sequelize_1.Op.like]: '%' + busqueda + '%'
-            }
-        } });
+    const [calle, numero] = busqueda.split(",");
+    const sepulturas = yield sepultura_1.default.findAll({
+        limit: 10,
+        where: {
+            calle: {
+                [sequelize_1.Op.like]: "%" + calle.trim() + "%",
+            },
+            numero: numero
+                ? {
+                    [sequelize_1.Op.like]: "%" + numero.trim() + "%",
+                }
+                : "",
+        },
+    });
     res.json(sepulturas);
     /* res.status(400).json({
-        msg: `Hable con el Administrador`
-    }) */
+              msg: `Hable con el Administrador`
+          }) */
 });
 exports.obtenerSepulturaCribada = obtenerSepulturaCribada;
 const crearSepulturaCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -41,10 +50,10 @@ const crearSepulturaCloudinary = (req, res) => __awaiter(void 0, void 0, void 0,
     const file = (_a = req.files) === null || _a === void 0 ? void 0 : _a.file;
     const validando = (0, validarExtensionCorte_1.validarExtensionCorte)(file);
     if (!validando) {
-        console.log('llego hasta aqui');
+        console.log("llego hasta aqui");
         res.status(404).json({
             ok: true,
-            msg: 'La extension no es válida'
+            msg: "La extension no es válida",
         });
     }
     else {
@@ -57,13 +66,13 @@ const crearSepulturaCloudinary = (req, res) => __awaiter(void 0, void 0, void 0,
             body.avatar = secure_url;
             const sepultura = sepultura_1.default.build(body);
             yield sepultura.save();
-            console.log('Sepultura creada en base de datos y archivo en Cloudinary');
+            console.log("Sepultura creada en base de datos y archivo en Cloudinary");
             res.json(sepultura);
         }
         catch (error) {
             console.log(error);
             res.status(500).json({
-                msg: `Hable con el Administrador`
+                msg: `Hable con el Administrador`,
             });
         }
     }
@@ -73,14 +82,14 @@ const obtenerFallecidosSepultura = (req, res) => __awaiter(void 0, void 0, void 
     const { id } = req.params;
     try {
         const fallecidossepultura = yield fallecido_1.default.findAll({
-            where: { sepulturaId: id }
+            where: { sepulturaId: id },
         });
         return res.json(fallecidossepultura);
     }
     catch (error) {
         console.log(error);
         return res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });
@@ -92,19 +101,19 @@ const actualizarSepultura = (req, res) => __awaiter(void 0, void 0, void 0, func
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({
             ok: false,
-            msg: 'No files were uploaded.'
+            msg: "No files were uploaded.",
         });
     }
     //Procesar archivo
     const file = req.files.file;
     console.log(file);
-    const fileCortado = file.name.split('.');
+    const fileCortado = file.name.split(".");
     const extensionArchivo = fileCortado[fileCortado.length - 1];
-    const extensionesValidas = ['png', 'jpg', 'jpeg', 'svg', 'gif'];
+    const extensionesValidas = ["png", "jpg", "jpeg", "svg", "gif"];
     if (!extensionesValidas.includes(extensionArchivo)) {
         return res.status(400).json({
             ok: false,
-            msg: 'Extension de archivo no permitida'
+            msg: "Extension de archivo no permitida",
         });
     }
     //Generar nombre del archivo
@@ -121,7 +130,7 @@ const actualizarSepultura = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (err) {
             return res.status(500).json({
                 ok: false,
-                err
+                err,
             });
         }
     });
@@ -131,7 +140,7 @@ const actualizarSepultura = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!sepultura) {
             return res.status(404).json({
                 ok: false,
-                msg: 'No existe sepultura con el ID'
+                msg: "No existe sepultura con el ID",
             });
         }
         body.avatar = nombreArchivo;
@@ -141,7 +150,7 @@ const actualizarSepultura = (req, res) => __awaiter(void 0, void 0, void 0, func
     catch (error) {
         console.log(error);
         return res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });
@@ -153,19 +162,19 @@ const actualizarSepulturaCloudinary = (req, res) => __awaiter(void 0, void 0, vo
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({
             ok: false,
-            msg: 'No files were uploaded.'
+            msg: "No files were uploaded.",
         });
     }
     //Procesar archivo
     const file = req.files.file;
     console.log(file);
-    const fileCortado = file.name.split('.');
+    const fileCortado = file.name.split(".");
     const extensionArchivo = fileCortado[fileCortado.length - 1];
-    const extensionesValidas = ['png', 'jpg', 'jpeg', 'svg', 'gif'];
+    const extensionesValidas = ["png", "jpg", "jpeg", "svg", "gif"];
     if (!extensionesValidas.includes(extensionArchivo)) {
         return res.status(400).json({
             ok: false,
-            msg: 'Extension de archivo no permitida'
+            msg: "Extension de archivo no permitida",
         });
     }
     //Generar nombre del archivo
@@ -182,7 +191,7 @@ const actualizarSepulturaCloudinary = (req, res) => __awaiter(void 0, void 0, vo
         if (err) {
             return res.status(500).json({
                 ok: false,
-                err
+                err,
             });
         }
     });
@@ -192,7 +201,7 @@ const actualizarSepulturaCloudinary = (req, res) => __awaiter(void 0, void 0, vo
         if (!sepultura) {
             return res.status(404).json({
                 ok: false,
-                msg: 'No existe sepultura con el ID'
+                msg: "No existe sepultura con el ID",
             });
         }
         body.avatar = nombreArchivo;
@@ -202,7 +211,7 @@ const actualizarSepulturaCloudinary = (req, res) => __awaiter(void 0, void 0, vo
     catch (error) {
         console.log(error);
         return res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });
@@ -214,19 +223,19 @@ const crearSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function*
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({
             ok: false,
-            msg: 'No files were uploaded.'
+            msg: "No files were uploaded.",
         });
     }
     //Procesar archivo
     const file = req.files.file;
     console.log(file);
-    const fileCortado = file.name.split('.');
+    const fileCortado = file.name.split(".");
     const extensionArchivo = fileCortado[fileCortado.length - 1];
-    const extensionesValidas = ['png', 'jpg', 'jpeg', 'svg', 'gif'];
+    const extensionesValidas = ["png", "jpg", "jpeg", "svg", "gif"];
     if (!extensionesValidas.includes(extensionArchivo)) {
         return res.status(400).json({
             ok: false,
-            msg: 'Extension de archivo no permitida'
+            msg: "Extension de archivo no permitida",
         });
     }
     //Generar nombre del archivo
@@ -244,12 +253,12 @@ const crearSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (err) {
             return res.status(500).json({
                 ok: false,
-                err
+                err,
             });
         }
         res.status(200).json({
             ok: true,
-            msg: 'Archivo Creado con exito'
+            msg: "Archivo Creado con exito",
         });
     });
     body.tipo = tipo;
@@ -257,12 +266,12 @@ const crearSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const sepultura = sepultura_1.default.build(body);
         yield sepultura.save();
-        console.log('Sepultura creada con exito');
+        console.log("Sepultura creada con exito");
     }
     catch (error) {
         console.log(error);
         return res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });
@@ -274,7 +283,7 @@ const deleteSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!sepultura) {
             return res.status(404).json({
                 ok: false,
-                msg: 'No existe sepultura con el ID: ' + id
+                msg: "No existe sepultura con el ID: " + id,
             });
         }
         let tipo = sepultura.tipo;
@@ -288,14 +297,14 @@ const deleteSepultura = (req, res) => __awaiter(void 0, void 0, void 0, function
         yield sepultura.destroy();
         return res.json({
             ok: true,
-            msg: 'Se ha eliminado de la Base de Datos lo abajo especificado: ',
-            sepultura
+            msg: "Se ha eliminado de la Base de Datos lo abajo especificado: ",
+            sepultura,
         });
     }
     catch (error) {
         console.log(error);
         return res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });
@@ -306,7 +315,7 @@ const obtenerSepulturas = (req, res) => __awaiter(void 0, void 0, void 0, functi
         if (sepultura.length === 0) {
             return res.status(404).json({
                 ok: false,
-                msg: 'No existe sepulturas en la Base de Datos'
+                msg: "No existe sepulturas en la Base de Datos",
             });
         }
         return res.json(sepultura);
@@ -314,7 +323,7 @@ const obtenerSepulturas = (req, res) => __awaiter(void 0, void 0, void 0, functi
     catch (error) {
         console.log(error);
         return res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });
@@ -326,7 +335,7 @@ const obtenerSepultura = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (!sepultura) {
             return res.status(404).json({
                 ok: false,
-                msg: 'No existe usuario con el ID: ' + id
+                msg: "No existe usuario con el ID: " + id,
             });
         }
         return res.json(sepultura);
@@ -334,7 +343,7 @@ const obtenerSepultura = (req, res) => __awaiter(void 0, void 0, void 0, functio
     catch (error) {
         console.log(error);
         return res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });

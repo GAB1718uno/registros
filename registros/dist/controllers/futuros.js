@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteFallecido = exports.actualizarFuturos = exports.actualizarFallecidoCloudinary = exports.crearFuturos = exports.crearFallecidoCloudinary = exports.getFallecido = exports.obtenerFuturos = exports.getFallecidosCriba = exports.obtenerRelacionado = void 0;
+exports.deleteFallecido = exports.actualizarFuturos = exports.borrarFuturos = exports.actualizarFallecidoCloudinary = exports.crearFuturos = exports.crearFallecidoCloudinary = exports.getFallecido = exports.obtenerFuturos = exports.getFallecidosCriba = exports.obtenerRelacionado = void 0;
 const sequelize_1 = require("sequelize");
 const validarExtensionCorte_1 = require("../helpers/validarExtensionCorte");
 const fallecido_1 = __importDefault(require("../models/fallecido"));
@@ -32,7 +32,7 @@ const obtenerRelacionado = (req, res) => __awaiter(void 0, void 0, void 0, funct
     catch (error) {
         console.log(error);
         res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });
@@ -41,25 +41,31 @@ const getFallecidosCriba = (req, res) => __awaiter(void 0, void 0, void 0, funct
     const tipo = req.params.tipo;
     const busqueda = req.params.termino;
     switch (tipo) {
-        case 'apellido':
-            const fallecidos = yield fallecido_1.default.findAll({ limit: 10,
-                where: { apellidos: {
-                        [sequelize_1.Op.like]: '%' + busqueda + '%'
-                    }
-                } });
+        case "apellido":
+            const fallecidos = yield fallecido_1.default.findAll({
+                limit: 10,
+                where: {
+                    apellidos: {
+                        [sequelize_1.Op.like]: "%" + busqueda + "%",
+                    },
+                },
+            });
             res.json(fallecidos);
             break;
-        case 'sepultura':
-            const fallecidosSep = yield fallecido_1.default.findAll({ limit: 10,
-                where: { sepult: {
-                        [sequelize_1.Op.like]: '%' + busqueda + '%'
-                    }
-                } });
+        case "sepultura":
+            const fallecidosSep = yield fallecido_1.default.findAll({
+                limit: 10,
+                where: {
+                    sepult: {
+                        [sequelize_1.Op.like]: "%" + busqueda + "%",
+                    },
+                },
+            });
             res.json(fallecidosSep);
             break;
         default:
             res.status(400).json({
-                msg: `Hable con el Administrador`
+                msg: `Hable con el Administrador`,
             });
     }
 });
@@ -67,6 +73,7 @@ exports.getFallecidosCriba = getFallecidosCriba;
 const obtenerFuturos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const futuros = yield futuros_1.default.findAll();
     res.json(futuros);
+    console.log(futuros);
 });
 exports.obtenerFuturos = obtenerFuturos;
 const getFallecido = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -78,15 +85,15 @@ exports.getFallecido = getFallecido;
 const crearFallecidoCloudinary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const body = req.body;
-    const tipo = 'fallecidos';
+    const tipo = "fallecidos";
     // Procesar la carga de la imagen
     const file = (_a = req.files) === null || _a === void 0 ? void 0 : _a.file;
     const validando = (0, validarExtensionCorte_1.validarExtensionCorte)(file);
     if (!validando) {
-        console.log('llego hasta aqui');
+        console.log("llego hasta aqui");
         res.status(404).json({
             ok: false,
-            msg: 'La extension no es válida'
+            msg: "La extension no es válida",
         });
     }
     else {
@@ -98,13 +105,13 @@ const crearFallecidoCloudinary = (req, res) => __awaiter(void 0, void 0, void 0,
             body.url = secure_url;
             const fallecido = fallecido_1.default.build(body);
             yield fallecido.save();
-            console.log('Fallecido creado en base de datos y archivo en Cloudinary');
+            console.log("Fallecido creado en base de datos y archivo en Cloudinary");
             res.json(fallecido);
         }
         catch (error) {
             console.log(error);
             res.status(500).json({
-                msg: `Hable con el Administrador`
+                msg: `Hable con el Administrador`,
             });
         }
     }
@@ -116,13 +123,13 @@ const crearFuturos = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         const futuros = futuros_1.default.build(body);
         yield futuros.save();
-        console.log('Fallecido creado en base de datos');
+        console.log("Fallecido creado en base de datos");
         res.json(futuros);
     }
     catch (error) {
         console.log(error);
         res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });
@@ -137,10 +144,10 @@ const actualizarFallecidoCloudinary = (req, res) => __awaiter(void 0, void 0, vo
     console.log(file);
     const validando = (0, validarExtensionCorte_1.validarExtensionCorte)(file);
     if (!validando) {
-        console.log('llego hasta aqui');
+        console.log("llego hasta aqui");
         res.status(404).json({
             ok: true,
-            msg: 'La extension no es válida'
+            msg: "La extension no es válida",
         });
     }
     else {
@@ -149,10 +156,31 @@ const actualizarFallecidoCloudinary = (req, res) => __awaiter(void 0, void 0, vo
         const { secure_url } = yield cloudinary_1.v2.uploader.upload(tempFilePath.tempFilePath);
         const nombreArchivo = secure_url;
         (0, actualizar_imagen_cloudinary_1.default)(id, tipo, nombreArchivo, body);
-        res.json('por fi');
+        res.json("por fi");
     }
 });
 exports.actualizarFallecidoCloudinary = actualizarFallecidoCloudinary;
+const borrarFuturos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    try {
+        const futuros = yield futuros_1.default.findByPk(id);
+        if (!futuros) {
+            return res.status(404).json({
+                ok: false,
+                msg: "No existe fallecido con el ID: " + id,
+            });
+        }
+        yield futuros.destroy();
+        res.json(futuros);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: `Hable con el Administrador`,
+        });
+    }
+});
+exports.borrarFuturos = borrarFuturos;
 const actualizarFuturos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     console.log(body);
@@ -162,7 +190,7 @@ const actualizarFuturos = (req, res) => __awaiter(void 0, void 0, void 0, functi
         if (!futuros) {
             return res.status(404).json({
                 ok: false,
-                msg: 'No existe ningun fallecido con el id ' + id
+                msg: "No existe ningun fallecido con el id " + id,
             });
         }
         yield futuros.update(body);
@@ -171,7 +199,7 @@ const actualizarFuturos = (req, res) => __awaiter(void 0, void 0, void 0, functi
     catch (error) {
         console.log(error);
         res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });
@@ -183,7 +211,7 @@ const deleteFallecido = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!fallecido) {
             return res.status(404).json({
                 ok: false,
-                msg: 'No existe usuario con el ID: ' + id
+                msg: "No existe usuario con el ID: " + id,
             });
         }
         yield fallecido.destroy();
@@ -192,7 +220,7 @@ const deleteFallecido = (req, res) => __awaiter(void 0, void 0, void 0, function
     catch (error) {
         console.log(error);
         res.status(500).json({
-            msg: `Hable con el Administrador`
+            msg: `Hable con el Administrador`,
         });
     }
 });

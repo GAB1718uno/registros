@@ -64,7 +64,7 @@ class Server {
     constructor(){
         this.app = express();
         this.secret = process.env.SECRET_JWT_SEED || '';
-        this.port = process.env.PORT || '3000'
+        this.port = process.env.PORT || '3100'
 
         this.dbConnection();
 
